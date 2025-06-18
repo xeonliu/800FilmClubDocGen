@@ -30,3 +30,10 @@ export interface Movie {
 //   desc: "影片讲述了两位京剧艺人生涯与情感的纠葛。",
 //   short: "一生所爱，终成空。"
 // };
+
+export interface MovieWithSchedule extends Movie {
+  isSalon: boolean;
+  showDate: string;
+  startTime: string;
+  endTime: string;
+}

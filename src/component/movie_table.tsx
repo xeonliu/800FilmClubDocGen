@@ -1,3 +1,4 @@
+import React from "react";
 import type { Movie } from "../model/movie";
 
 /**

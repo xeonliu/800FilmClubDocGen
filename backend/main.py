@@ -1,5 +1,5 @@
 """
-800电影社文档生成器 — Python 后端
+800号电影社文档生成器 — Python 后端
 支持从豆瓣 / TMDB / IMDB 抓取电影信息，返回统一格式供前端自动填表。
 
 启动方式：
@@ -26,7 +26,7 @@ from pydantic import BaseModel, field_validator
 
 load_dotenv()
 
-app = FastAPI(title="800电影社文档生成器 API", version="1.0.0")
+app = FastAPI(title="800号电影社文档生成器 API", version="1.0.0")
 
 # 允许前端开发服务器跨域调用。
 # ⚠️  生产环境请将 "*" 替换为前端实际域名，如 ["https://your-frontend.example.com"]
@@ -477,7 +477,7 @@ def fetch_imdb(url: str) -> MovieInfo:
 
 @app.get("/")
 def health():
-    return {"status": "ok", "message": "800电影社文档生成器 API 运行中"}
+    return {"status": "ok", "message": "800号电影社文档生成器 API 运行中"}
 
 
 @app.post("/api/fetch-movie", response_model=MovieInfo)

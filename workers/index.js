@@ -1,5 +1,5 @@
 /**
- * 800电影社文档生成器 — Cloudflare Workers 后端
+ * 800号电影社文档生成器 — Cloudflare Workers 后端
  *
  * 支持从豆瓣 / TMDB / IMDB (OMDb) 抓取电影信息。
  *
@@ -23,7 +23,7 @@ export default {
 
     if (url.pathname === "/" && request.method === "GET") {
       return corsResponse(
-        Response.json({ status: "ok", message: "800电影社文档生成器 API 运行中" })
+        Response.json({ status: "ok", message: "800号电影社文档生成器 API 运行中" })
       );
     }
 

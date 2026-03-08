@@ -22,8 +22,7 @@ export default function InstructionsModule() {
                 <span style={{ fontFamily: "Wingdings", marginRight: "4pt" }}>&#178;</span>
                 <span style={{ fontFamily: "华文宋体" }}>
                     填写好此表格，交给
-                    <b>纪昕</b>
-                    （cc_cassie6）
+                    <b>宣策部部长</b>
                 </span>
             </p>
 
@@ -31,9 +30,9 @@ export default function InstructionsModule() {
             <p className="MsoNormal list-para">
                 <span style={{ fontFamily: "Wingdings", marginRight: "4pt" }}>&#178;</span>
                 <span style={{ fontFamily: "华文宋体" }}>
-                    并准备好影片放映资源，通过云盘（推荐 jbox）交由
-                    <b>李炜森</b>
-                    （Bucciarati_QAQ）检查
+                    并准备好影片放映资源，通过云盘（推荐jCloud）交由
+                    <b>放映部部长</b>
+                    检查
                 </span>
             </p>
 

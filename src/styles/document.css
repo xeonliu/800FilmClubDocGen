@@ -1,0 +1,218 @@
+/* ============================================================
+   文档预览查看器
+   ============================================================ */
+.doc-viewer {
+  background: #c8c8c8;
+  padding: 40px 20px;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+/* ============================================================
+   A4 页面容器
+   595.3pt × 841.9pt（Word 默认 A4），边距 72pt/90pt
+   ============================================================ */
+.doc-page {
+  width: 595.3pt;
+  min-height: 841.9pt; /* A4 标准高度 */
+  padding: 72pt 90pt;
+  background: white;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+  margin: 0 auto 20px; /* 控制页面之间的间距 */
+  box-sizing: border-box;
+  /* 基础字体：等线，与 Word 默认一致 */
+  font-family: 等线, DengXian, "Microsoft YaHei", "PingFang SC", sans-serif;
+  font-size: 10.5pt;
+  color: #000;
+  line-height: normal;
+  /* 避免字体平滑影响中文字重 */
+  -webkit-font-smoothing: subpixel-antialiased;
+}
+
+/* ============================================================
+   模拟分页线（屏幕可见，打印时变为真实分页）
+   ============================================================ */
+.doc-page-break-screen {
+  margin: 0 -90pt;
+  height: 28px;
+  background: #c8c8c8;
+  border-top: 1px solid #aaa;
+  border-bottom: 1px solid #aaa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9pt;
+  color: #888;
+  font-family: sans-serif;
+  letter-spacing: 0.05em;
+}
+
+/* ============================================================
+   MsoNormal — Word 默认段落
+   ============================================================ */
+.doc-page .MsoNormal {
+  margin: 0;
+  text-align: justify;
+  text-justify: inter-ideograph;
+  font-size: 10.5pt;
+  font-family: 等线, DengXian, "Microsoft YaHei", "PingFang SC", sans-serif;
+}
+
+/* ============================================================
+   列表段落（带缩进，用于指示说明的项目符号行）
+   ============================================================ */
+.doc-page .list-para {
+  margin: 0;
+  margin-left: 21pt;
+  text-indent: -21pt;
+  text-align: justify;
+  text-justify: inter-ideograph;
+  font-size: 10.5pt;
+  font-family: 等线, DengXian, "Microsoft YaHei", "PingFang SC", sans-serif;
+}
+
+/* ============================================================
+   h1 — 一级标题（16pt 华文宋体加粗）
+   ============================================================ */
+.doc-page h1 {
+  margin: 0;
+  text-align: justify;
+  text-justify: inter-ideograph;
+  font-size: 16pt;
+  font-family: 华文宋体, STSong, SimSun, "Noto Serif CJK SC", serif;
+  font-weight: bold;
+  line-height: normal;
+}
+
+/* ============================================================
+   h2 — 二级标题（10.5pt 华文宋体加粗斜体下划线）
+   ============================================================ */
+.doc-page h2 {
+  margin: 0;
+  text-align: justify;
+  text-justify: inter-ideograph;
+  font-size: 10.5pt;
+  font-family: 华文宋体, STSong, SimSun, "Noto Serif CJK SC", serif;
+  font-weight: bold;
+  font-style: italic;
+  text-decoration: underline;
+  line-height: normal;
+}
+
+/* ============================================================
+   MsoSubtleReference — 注释/说明文字（华文仿宋）
+   ============================================================ */
+.doc-page .MsoSubtleReference {
+  font-family: 华文仿宋, STFangSong, FangSong, "Noto Serif CJK SC", serif;
+}
+
+/* ============================================================
+   放映安排 — 带左缩进的场次行
+   ============================================================ */
+.doc-page .schedule-line {
+  margin: 0;
+  margin-left: 21pt;
+  text-align: justify;
+  text-justify: inter-ideograph;
+  font-size: 10.5pt;
+  font-family: 华文宋体, STSong, SimSun, serif;
+}
+
+/* ============================================================
+   电影信息表格（MsoTableGrid）
+   ============================================================ */
+.doc-page table.MsoTableGrid {
+  margin-left: -0.25pt;
+  border-collapse: collapse;
+  border: none;
+}
+
+/* 表格左列（字段名）通用 */
+.doc-page .td-label {
+  border-top: none;
+  border-left: none;
+  border-bottom: solid windowtext 1pt;
+  border-right: solid windowtext 1pt;
+  padding: 0 5.4pt 0 5.4pt;
+  height: 21.25pt;
+  vertical-align: middle;
+}
+
+/* 表格右列（字段值）通用 */
+.doc-page .td-value {
+  border: none;
+  border-bottom: solid windowtext 1pt;
+  padding: 0 5.4pt 0 5.4pt;
+  height: 21.25pt;
+  vertical-align: middle;
+}
+
+/* 最后一行左列（无下边框） */
+.doc-page .td-label-last {
+  border-top: none;
+  border-left: none;
+  border-bottom: none;
+  border-right: solid windowtext 1pt;
+  padding: 0 5.4pt 0 5.4pt;
+  height: 21.25pt;
+  vertical-align: middle;
+}
+
+/* 最后一行右列（无边框） */
+.doc-page .td-value-last {
+  border: none;
+  padding: 0 5.4pt 0 5.4pt;
+  height: 21.25pt;
+  vertical-align: top;
+}
+
+/* 短评右列（左对齐，行高特殊） */
+.doc-page .td-value-short {
+  border: none;
+  border-bottom: solid windowtext 1pt;
+  padding: 0 5.4pt 0 5.4pt;
+  height: 21.25pt;
+  vertical-align: top;
+}
+
+/* ============================================================
+   沙龙导赏居中引言
+   ============================================================ */
+.doc-page .salon-quote {
+  text-align: center;
+  font-family: 华文仿宋, STFangSong, FangSong, serif;
+  font-size: 10.5pt;
+  margin: 0;
+}
+
+/* ============================================================
+   打印 / PDF 导出样式
+   ============================================================ */
+@media print {
+  .doc-viewer {
+    background: white !important;
+    padding: 0 !important;
+  }
+
+  .doc-page {
+    width: 100% !important;
+    min-height: 0 !important; /* 打印时靠 @page 边距控制，高度自然流动 */
+    padding: 0 !important;    /* 打印边距由 @page 控制 */
+    box-shadow: none !important;
+    margin: 0 !important;
+    page-break-after: always; /* 每页内容后强制分页 */
+  }
+
+  .doc-page:last-child {
+    page-break-after: auto;   /* 最后一页不强制分页，防止空白页 */
+  }
+
+  .doc-page-break-screen {
+    display: none !important;
+  }
+}
+
+@page {
+  size: A4;
+  margin: 72pt 90pt;
+}

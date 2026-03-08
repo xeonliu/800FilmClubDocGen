@@ -14,10 +14,11 @@
    ============================================================ */
 .doc-page {
   width: 595.3pt;
+  min-height: 841.9pt; /* A4 标准高度 */
   padding: 72pt 90pt;
   background: white;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
-  margin: 0 auto 0;
+  margin: 0 auto 20px; /* 控制页面之间的间距 */
   box-sizing: border-box;
   /* 基础字体：等线，与 Word 默认一致 */
   font-family: 等线, DengXian, "Microsoft YaHei", "PingFang SC", sans-serif;
@@ -189,28 +190,29 @@
    ============================================================ */
 @media print {
   .doc-viewer {
-    background: white;
-    padding: 0;
+    background: white !important;
+    padding: 0 !important;
   }
 
   .doc-page {
-    width: auto;
-    padding: 0;
-    box-shadow: none;
-    margin: 0;
+    width: 100% !important;
+    min-height: 0 !important; /* 打印时靠 @page 边距控制，高度自然流动 */
+    padding: 0 !important;    /* 打印边距由 @page 控制 */
+    box-shadow: none !important;
+    margin: 0 !important;
+    page-break-after: always; /* 每页内容后强制分页 */
+  }
+
+  .doc-page:last-child {
+    page-break-after: auto;   /* 最后一页不强制分页，防止空白页 */
   }
 
   .doc-page-break-screen {
-    display: none;
-  }
-
-  .doc-page-break-print {
-    break-before: page;
-    page-break-before: always;
+    display: none !important;
   }
 }
 
 @page {
-  size: 595.3pt 841.9pt;
-  margin: 72pt 90pt 72pt 90pt;
+  size: A4;
+  margin: 72pt 90pt;
 }

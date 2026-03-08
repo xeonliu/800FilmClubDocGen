@@ -39,6 +39,7 @@ export default function DocumentPreview({ data }: Props) {
 
     return (
         <div className="doc-viewer">
+            {/* ── 第 1 页 ─────────────────── */}
             <div className="doc-page">
                 {/* ── 模块 1：指示说明（可选） ─────────────────── */}
                 {showInstructions && <InstructionsModule />}
@@ -51,13 +52,10 @@ export default function DocumentPreview({ data }: Props) {
 
                 {/* ── 模块 4：关于电影周主题 ───────────────────── */}
                 <ThemeModule themeText={themeText} />
+            </div>
 
-                {/* ── 分页线（屏幕可见，打印时隐藏并由 break-before 接管） */}
-                <div className="doc-page-break-screen" aria-hidden="true">
-                    — 分页 —
-                </div>
-
-                {/* ── 模块 5：周五沙龙 ─────────────────────────── */}
+            {/* ── 第 2 页 ─────────────────── */}
+            <div className="doc-page">
                 {salonMovie && (
                     <SalonModule
                         movie={salonMovie}
@@ -70,7 +68,6 @@ export default function DocumentPreview({ data }: Props) {
                     <span style={{ fontFamily: "华文宋体" }}>&nbsp;</span>
                 </p>
 
-                {/* ── 模块 6：周末影院 ─────────────────────────── */}
                 {weekendMovies.length > 0 && (
                     <WeekendCinemaModule movies={weekendMovies} />
                 )}

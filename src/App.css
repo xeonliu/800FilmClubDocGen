@@ -49,15 +49,16 @@ body,
   border-right: 1px solid #d0d0d8;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow-y: auto; /* 关键：允许面板整体滚动 */
+  overflow-x: hidden;
   transition: width 0.25s ease, min-width 0.25s ease;
   position: relative;
   z-index: 10;
 }
 
 .editor-panel.collapsed {
-  width: 36px;
-  min-width: 36px;
+  width: 40px;
+  min-width: 40px;
 }
 
 /* 折叠/展开按钮 */
@@ -76,9 +77,13 @@ body,
   align-items: center;
   justify-content: center;
   color: #555;
-  z-index: 1;
+  z-index: 100; /* 确保在最上层 */
   padding: 0;
   line-height: 1;
+}
+
+.editor-panel.collapsed .panel-collapse-btn {
+  right: 8px; /* 折叠状态下也保持可见 */
 }
 
 .panel-collapse-btn:hover {
@@ -88,7 +93,6 @@ body,
 /* 面板内容区（折叠后隐藏） */
 .editor-panel-inner {
   flex: 1;
-  overflow-y: auto;
   padding: 14px 12px 20px;
   display: flex;
   flex-direction: column;

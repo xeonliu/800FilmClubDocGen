@@ -37,6 +37,14 @@ body,
     width: 100% !important;
     overflow: visible !important;
   }
+  /* 标签栏在打印时隐藏 */
+  .preview-tabs {
+    display: none !important;
+  }
+  /* 非激活的标签内容在打印时隐藏 */
+  .tab-hidden {
+    display: none !important;
+  }
 }
 
 /* ============================================================
@@ -447,8 +455,72 @@ body,
 }
 
 /* ============================================================
-   电影导入弹窗
+   预览标签栏
    ============================================================ */
+.preview-tabs {
+  display: flex;
+  gap: 0;
+  background: #2c2c3a;
+  padding: 8px 12px 0;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  border-bottom: 2px solid #5563de;
+}
+
+.preview-tab {
+  padding: 7px 18px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-radius: 6px 6px 0 0;
+  font-size: 13px;
+  color: #bbb;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+
+.preview-tab:hover:not(.active) {
+  background: #3a3a50;
+  color: #ddd;
+}
+
+.preview-tab.active {
+  background: #5563de;
+  color: #fff;
+  border-color: #5563de;
+  font-weight: 600;
+}
+
+/* 标签内容容器 */
+.tab-content {
+  display: block;
+}
+
+.tab-hidden {
+  display: none;
+}
+
+/* ============================================================
+   tooltip 标签样式
+   ============================================================ */
+.editor-label-with-tip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #555;
+  cursor: default;
+}
+
+.editor-label-tip-icon {
+  font-size: 11px;
+  color: #8891d8;
+  cursor: help;
+  user-select: none;
+}
 .modal-overlay {
   position: fixed;
   inset: 0;

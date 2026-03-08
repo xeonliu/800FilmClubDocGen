@@ -26,6 +26,11 @@ export interface EditorMovieData {
   // 沙龙模块特定字段
   salonQuote?: string;    // 沙龙引言
   salonReview?: string[]; // 沙龙导赏段落
+
+  // 报备表专用字段
+  awards: string;         // 获奖信息
+  recommendation: string; // 推荐理由
+  risk: string;           // 放映风险
 }
 
 /**
@@ -38,6 +43,10 @@ export interface EditorFormData {
   salonQuote: string;         // 沙龙引言
   salonReview: string[];      // 沙龙导赏段落（可多段）
   movies: EditorMovieData[];  // 所有放映篇目（沙龙+周末）
+  // 报备表专用字段
+  semester: string;           // 学期，如 "2025年秋"
+  significance: string;       // 放映意义
+  overallRisk: string;        // 整体放映风险评价
 }
 
 /** 电影信息导入来源 */

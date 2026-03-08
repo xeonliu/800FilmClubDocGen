@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import "./App.css";
 import DocumentPreview from "./component/document_preview";
+import ReportPreview from "./component/report_preview";
 import EditorPanel from "./component/editor_panel";
 import {
   initialEditorState,
@@ -10,6 +11,8 @@ import {
 import type { EditorFormData } from "./model/editor";
 
 const STORAGE_KEY = "800_FLIM_CLUB_EDITOR_DATA";
+
+type PreviewTab = "doc" | "report";
 
 function parseStoredDate(value: unknown): Date | null {
   if (value === null || value === undefined || value === "") return null;
@@ -62,6 +65,7 @@ function App() {
   });
 
   const [panelCollapsed, setPanelCollapsed] = useState(false);
+  const [activeTab, setActiveTab] = useState<PreviewTab>("doc");
 
   // 当 editorData 改变时自动保存到 localStorage
   useEffect(() => {
@@ -86,9 +90,34 @@ function App() {
         }}
         collapsed={panelCollapsed}
         onToggleCollapse={() => setPanelCollapsed((v) => !v)}
+        activeTab={activeTab}
       />
       <main className="preview-area">
-        <DocumentPreview data={documentData} />
+        {/* ── 预览标签栏 ─────────────────── */}
+        <div className="preview-tabs">
+          <button
+            className={`preview-tab${activeTab === "doc" ? " active" : ""}`}
+            onClick={() => setActiveTab("doc")}
+          >
+            📄 电影周宣传资料
+          </button>
+          <button
+            className={`preview-tab${activeTab === "report" ? " active" : ""}`}
+            onClick={() => setActiveTab("report")}
+          >
+            📋 放映报备表
+          </button>
+        </div>
+
+        {/* ── 文档预览（宣传资料）─────────── */}
+        <div className={activeTab === "doc" ? "tab-content" : "tab-content tab-hidden"}>
+          <DocumentPreview data={documentData} />
+        </div>
+
+        {/* ── 报备表预览 ──────────────────── */}
+        <div className={activeTab === "report" ? "tab-content" : "tab-content tab-hidden"}>
+          <ReportPreview data={documentData} />
+        </div>
       </main>
     </div>
   );

@@ -252,13 +252,18 @@ export default function ReportPreview({ data }: Props) {
                 {[
                     "请策展同学于电影周首次放映前提前两周确定选片，填好报备表，并准备好放映资源，一起交给放映部部长；",
                     "放映部负责人过目后，于电影周前两周周三前将报备表及放映资源交由外联部；",
-                    "外联部负责同学需于电影周前两周周五前将报备表与放映资源交至庞博老师；",
-                    "由于推送、海报等制作需要一周的周期，并需要于活动举办前几天发布进行宣传，请庞博老师于电影周前一周周二前反馈审核意见。",
+                    <Fragment>外联部负责同学需于电影周前两周周五前将报备表与放映资源交至庞博老师；</Fragment>,
+                    <Fragment>由于推送、海报等制作需要一周的周期，并需要于活动举办前几天发布进行宣传，请<span style={{ display: "inline-block", whiteSpace: "nowrap" }}>庞博老师</span>于电影周前一周周二前反馈审核意见。</Fragment>,
                 ].map((text, i) => (
                     <p key={i} className="MsoNormal list-para">
                         <span style={{ fontFamily: "华文仿宋" }}>{i + 1}）{text}</span>
                     </p>
                 ))}
+                
+                <p className="MsoNormal">
+                    <span style={{ fontFamily: "华文仿宋" }}>&nbsp;</span>
+                </p>
+
                 <p className="MsoNormal">
                     <span style={{ fontFamily: "华文仿宋" }}>若按每半学期提交：</span>
                 </p>

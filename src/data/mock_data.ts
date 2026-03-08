@@ -7,11 +7,17 @@ export const mockDocumentData: DocumentData = {
   showInstructions: true,
 
   info: {
-    week: "9",
+    week: "",
     speaker: "策展人",
     theme: "战争迷雾",
     themeDesc: "从不同切入点描绘的各种形式的战争",
+    studentId: "",
+    department: "",
   },
+
+  semester: "2026年春",
+  significance: "",
+  overallRisk: "",
 
   schedule: {
     movies: [
@@ -32,6 +38,9 @@ export const mockDocumentData: DocumentData = {
         showDate: "4月13日 周四",
         startTime: "18:30",
         endTime: "21:00",
+        awards: "",
+        recommendation: "",
+        risk: "",
       },
       {
         chinese: "阿尔及尔之战",
@@ -57,6 +66,9 @@ export const mockDocumentData: DocumentData = {
           "影片的可贵之处在于其拒绝单一的道德判断。法军将领马修并非脸谱化的暴徒，FLN战士也并非无瑕的圣人——轰炸咖啡馆的女游击队员、被迫妥协的囚犯、冷静指挥酷刑的情报官，每个人都身陷结构性暴力的漩涡。彭泰科沃以近乎古典的悲剧感，呈现了一场没有赢家的战争：即便阿尔及利亚最终独立，银幕上也没有振臂高呼的胜利时刻，只有街头奔涌人潮背后未竟的沉默。",
           `《阿尔及尔之战》问世六十年后，仍不断被军事学院、政治学系和电影学院列为必修文本，这本身就是一种讽刺——人类从这部电影里学到了如何更有效地镇压革命，却始终学不会如何避免制造革命。本期沙龙将围绕"再现"与"真相"、"反殖民叙事"与"暴力的正当性"等议题展开讨论，欢迎大家带着问题入场。`,
         ],
+        awards: "",
+        recommendation: "",
+        risk: "",
       },
       {
         chinese: "影子军队",
@@ -75,6 +87,9 @@ export const mockDocumentData: DocumentData = {
         showDate: "4月15日 周六",
         startTime: "18:30",
         endTime: "21:00",
+        awards: "",
+        recommendation: "",
+        risk: "",
       },
       {
         chinese: "光荣之路",
@@ -93,6 +108,9 @@ export const mockDocumentData: DocumentData = {
         showDate: "4月16日 周日",
         startTime: "18:30",
         endTime: "20:00",
+        awards: "",
+        recommendation: "",
+        risk: "",
       },
     ],
   },

@@ -13,6 +13,7 @@ interface EditorPanelProps {
   onReset: () => void;
   collapsed: boolean;
   onToggleCollapse: () => void;
+  activeTab?: "doc" | "report";
 }
 
 /** 可折叠区块 */
@@ -38,6 +39,16 @@ function Section({
       </button>
       {open && <div className="editor-section-body">{children}</div>}
     </div>
+  );
+}
+
+/** 带 tooltip 的标签 */
+function LabelWithTip({ label, tip }: { label: string; tip: string }) {
+  return (
+    <span className="editor-label-with-tip" title={tip}>
+      {label}
+      <span className="editor-label-tip-icon" aria-hidden="true">ⓘ</span>
+    </span>
   );
 }
 
@@ -191,6 +202,48 @@ function MovieEditor({
         />
       </div>
 
+      {/* 报备表字段：获奖信息 / 推荐理由 / 放映风险 */}
+      <div className="editor-field editor-field-full">
+        <label className="editor-label" title="所获主要奖项，如无则填「无」">
+          获奖信息
+        </label>
+        <input
+          className="editor-input"
+          type="text"
+          placeholder='所获主要奖项，如无则填"无"'
+          value={movie.awards}
+          onChange={(e) => set("awards", e.target.value)}
+        />
+      </div>
+
+      <div className="editor-field editor-field-full">
+        <LabelWithTip
+          label="推荐理由"
+          tip="请从所获奖项、影视地位、艺术解读等角度阐述选片的原因（仅用于报备表）"
+        />
+        <textarea
+          className="editor-textarea"
+          placeholder="请从所获奖项、影视地位、艺术解读等角度阐述选片的原因"
+          rows={3}
+          value={movie.recommendation}
+          onChange={(e) => set("recommendation", e.target.value)}
+        />
+      </div>
+
+      <div className="editor-field editor-field-full">
+        <LabelWithTip
+          label="放映风险"
+          tip="1）查找并附上该电影可放映的所有官方渠道（如爱奇艺、腾讯视频、bilibili）；2）若无在线正版播放渠道，可查找官方电影节或电影资料馆的公映记录；3）如以上均无，请对电影主题、镜头、台词等可能存在的风险进行预判（仅用于报备表）"
+        />
+        <textarea
+          className="editor-textarea"
+          placeholder="附上官方放映渠道链接，或说明放映风险"
+          rows={2}
+          value={movie.risk}
+          onChange={(e) => set("risk", e.target.value)}
+        />
+      </div>
+
       {/* 沙龙专属字段：引言与导赏 */}
       {movie.isSalon && (
         <div className="salon-editor-fields">
@@ -262,6 +315,7 @@ export default function EditorPanel({
   collapsed,
   onToggleCollapse,
   onReset,
+  activeTab = "doc",
 }: EditorPanelProps) {
   const setInfo = useCallback(
     (key: keyof typeof data.info, value: string) => {
@@ -289,6 +343,9 @@ export default function EditorPanel({
     setMovies([...data.movies, createEmptyMovie(isSalon)]);
   }
 
+  const tabName = activeTab === "report" ? "报备表" : "宣传资料";
+  const printLabel = `🖨️ 打印${tabName}`;
+
   return (
     <aside
       className={`editor-panel${collapsed ? " collapsed" : ""}`}
@@ -312,9 +369,9 @@ export default function EditorPanel({
               <button
                 className="btn-print"
                 onClick={() => window.print()}
-                title="打印 / 导出 PDF"
+                title={`打印当前预览标签页 / 导出 PDF（当前：${tabName}）`}
               >
-                🖨️ 打印 / 导出 PDF
+                {printLabel}
               </button>
               <button
                 className="panel-reset-btn"
@@ -342,8 +399,8 @@ export default function EditorPanel({
               />
             </div>
             <div className="editor-field">
-              <label className="editor-label" title="本期主讲嘉宾姓名">
-                主讲人
+              <label className="editor-label" title="本期主讲/策展嘉宾姓名">
+                主讲人/策展人
               </label>
               <input
                 className="editor-input"
@@ -351,6 +408,30 @@ export default function EditorPanel({
                 placeholder="姓名"
                 value={data.info.speaker}
                 onChange={(e) => setInfo("speaker", e.target.value)}
+              />
+            </div>
+            <div className="editor-field">
+              <label className="editor-label" title="策展人学号（仅用于报备表）">
+                学号
+              </label>
+              <input
+                className="editor-input"
+                type="text"
+                placeholder="学号（报备表用）"
+                value={data.info.studentId}
+                onChange={(e) => setInfo("studentId", e.target.value)}
+              />
+            </div>
+            <div className="editor-field">
+              <label className="editor-label" title="策展人院系专业（仅用于报备表）">
+                院系专业
+              </label>
+              <input
+                className="editor-input"
+                type="text"
+                placeholder="如：计算机科学与技术（报备表用）"
+                value={data.info.department}
+                onChange={(e) => setInfo("department", e.target.value)}
               />
             </div>
             <div className="editor-field">
@@ -375,6 +456,18 @@ export default function EditorPanel({
                 placeholder="一句话介绍"
                 value={data.info.themeDesc}
                 onChange={(e) => setInfo("themeDesc", e.target.value)}
+              />
+            </div>
+            <div className="editor-field">
+              <label className="editor-label" title="学期标识，如 2025年秋（用于报备表标题）">
+                学期
+              </label>
+              <input
+                className="editor-input"
+                type="text"
+                placeholder="如：2025年秋（报备表用）"
+                value={data.semester}
+                onChange={(e) => onChange({ ...data, semester: e.target.value })}
               />
             </div>
             <div className="editor-field">
@@ -403,6 +496,37 @@ export default function EditorPanel({
                 rows={6}
                 value={data.themeText}
                 onChange={(e) => onChange({ ...data, themeText: e.target.value })}
+              />
+            </div>
+          </Section>
+
+          {/* ─── 报备表专属信息 ─── */}
+          <Section title="📑 报备表信息" defaultOpen={false}>
+            <p className="editor-hint">以下字段仅用于放映报备表，不影响宣传资料。</p>
+            <div className="editor-field editor-field-full">
+              <LabelWithTip
+                label="放映意义"
+                tip="简要说明本次影展的选片意义和策划初衷"
+              />
+              <textarea
+                className="editor-textarea"
+                placeholder="简要说明本次影展的选片意义和策划初衷"
+                rows={4}
+                value={data.significance}
+                onChange={(e) => onChange({ ...data, significance: e.target.value })}
+              />
+            </div>
+            <div className="editor-field editor-field-full">
+              <LabelWithTip
+                label="整体放映风险评价"
+                tip="对本次影展所有影片整体放映风险的综合评估"
+              />
+              <textarea
+                className="editor-textarea"
+                placeholder="对本次影展所有影片整体放映风险的综合评估"
+                rows={3}
+                value={data.overallRisk}
+                onChange={(e) => onChange({ ...data, overallRisk: e.target.value })}
               />
             </div>
           </Section>

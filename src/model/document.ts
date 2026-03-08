@@ -23,4 +23,10 @@ export interface DocumentData {
   salonQuote: string;
   /** 模块5：沙龙篇目导赏——2-3 段导赏文字 */
   salonReview: string[];
+  /** 报备表：学期，如 "2025年秋" */
+  semester?: string;
+  /** 报备表：放映意义 */
+  significance?: string;
+  /** 报备表：整体放映风险评价 */
+  overallRisk?: string;
 }

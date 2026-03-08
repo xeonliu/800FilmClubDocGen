@@ -13,6 +13,10 @@ export interface Movie {
   douban: string;     // 豆瓣评分
   desc: string;       // 剧情简介
   short: string;      // 豆瓣短评
+  // 报备表专用字段
+  awards: string;         // 获奖信息
+  recommendation: string; // 推荐理由
+  risk: string;           // 放映风险
 }
 
 // 例如：

@@ -27,6 +27,9 @@ function movieWithScheduleToEditor(m: MovieWithSchedule): EditorMovieData {
     endTime: m.endTime,
     salonQuote: m.salonQuote || "",
     salonReview: m.salonReview ? [...m.salonReview] : [""],
+    awards: m.awards || "",
+    recommendation: m.recommendation || "",
+    risk: m.risk || "",
   };
 }
 
@@ -53,6 +56,9 @@ function editorMovieToDocument(m: EditorMovieData): MovieWithSchedule {
     endTime: m.endTime,
     salonQuote: m.salonQuote || "",
     salonReview: m.salonReview ? [...m.salonReview] : [""],
+    awards: m.awards || "",
+    recommendation: m.recommendation || "",
+    risk: m.risk || "",
   };
 }
 
@@ -67,6 +73,9 @@ export function documentToEditorForm(doc: DocumentData): EditorFormData {
     salonQuote: doc.salonQuote,
     salonReview: [...doc.salonReview],
     movies: doc.schedule.movies.map(movieWithScheduleToEditor),
+    semester: doc.semester || "",
+    significance: doc.significance || "",
+    overallRisk: doc.overallRisk || "",
   };
 }
 
@@ -83,6 +92,9 @@ export function editorFormToDocument(editor: EditorFormData): DocumentData {
     schedule: {
       movies: editor.movies.map(editorMovieToDocument),
     },
+    semester: editor.semester,
+    significance: editor.significance,
+    overallRisk: editor.overallRisk,
   };
 }
 
@@ -107,6 +119,9 @@ export function createEmptyMovie(isSalon = false): EditorMovieData {
     showDate: null,
     startTime: "18:30",
     endTime: "21:00",
+    awards: "",
+    recommendation: "",
+    risk: "",
   };
 }
 

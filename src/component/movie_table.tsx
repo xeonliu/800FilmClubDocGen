@@ -49,24 +49,24 @@ export default function MovieTable({ movie, variant = "regular" }: MovieTablePro
     };
 
     const rows: { label: string; value: React.ReactNode }[] = [
-        { label: "中文名", value: <span style={{ fontFamily: "华文宋体" }}>{movie.chinese}</span> },
-        { label: "外文名", value: <span style={{ fontFamily: "华文宋体" }}>{movie.foreign}</span> },
-        { label: "年份", value: <span style={{ fontFamily: "华文宋体" }}>{movie.year}</span> },
-        { label: "导演", value: <span style={{ fontFamily: "华文宋体" }}>{movie.director}</span> },
-        { label: "编剧", value: <span style={{ fontFamily: "华文宋体" }}>{movie.writer}</span> },
-        { label: "主演", value: <span style={{ fontFamily: "华文宋体" }}>{movie.actors}</span> },
-        { label: "类型", value: <span style={{ fontFamily: "华文宋体" }}>{movie.genre}</span> },
-        { label: "制片地区/国家", value: <span style={{ fontFamily: "华文宋体" }}>{movie.region}</span> },
+        { label: "中文名", value: <span style={{ fontFamily: "华文楷体" }}>{movie.chinese}</span> },
+        { label: "外文名", value: <span style={{ fontFamily: "华文楷体" }}>{movie.foreign}</span> },
+        { label: "年份", value: <span style={{ fontFamily: "华文楷体" }}>{movie.year}</span> },
+        { label: "导演", value: <span style={{ fontFamily: "华文楷体" }}>{movie.director}</span> },
+        { label: "编剧", value: <span style={{ fontFamily: "华文楷体" }}>{movie.writer}</span> },
+        { label: "主演", value: <span style={{ fontFamily: "华文楷体" }}>{movie.actors}</span> },
+        { label: "类型", value: <span style={{ fontFamily: "华文楷体" }}>{movie.genre}</span> },
+        { label: "制片地区/国家", value: <span style={{ fontFamily: "华文楷体" }}>{movie.region}</span> },
         {
             label: "片长",
             value: (
                 <>
-                    <span style={{ fontFamily: "华文宋体" }}>{movie.length}</span>
-                    <span style={{ fontFamily: "华文宋体" }}>分钟</span>
+                    <span style={{ fontFamily: "华文楷体" }}>{movie.length}</span>
+                    <span style={{ fontFamily: "华文楷体" }}>分钟</span>
                 </>
             ),
         },
-        { label: "豆瓣评分", value: <span style={{ fontFamily: "华文宋体" }}>{movie.douban}</span> },
+        { label: "豆瓣评分", value: <span style={{ fontFamily: "华文楷体" }}>{movie.douban}</span> },
         { label: "剧情简介", value: <span style={{ fontFamily: "华文宋体" }}>{movie.desc}</span> },
     ];
 
@@ -105,9 +105,9 @@ export default function MovieTable({ movie, variant = "regular" }: MovieTablePro
                             className="MsoNormal"
                             style={{
                                 textAlign: "left",
-                                lineHeight: "20.4pt",
+                                lineHeight: "12pt",
                                 background: "white",
-                                fontFamily: "宋体",
+                                fontFamily: "华文黑体",
                                 fontSize: "10.0pt",
                                 color: "black",
                             }}

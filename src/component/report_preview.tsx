@@ -141,22 +141,6 @@ export default function ReportPreview({ data }: Props) {
     const salonMovies = schedule.movies.filter((m) => m.isSalon);
     const regularMovies = schedule.movies.filter((m) => !m.isSalon);
 
-    const headerLabelStyle: React.CSSProperties = {
-        border: "solid windowtext 1.0pt",
-        padding: "3pt 5.4pt",
-        verticalAlign: "middle",
-        fontFamily: "华文宋体",
-        fontWeight: "bold",
-        width: "85.3pt",
-    };
-    const headerValueStyle: React.CSSProperties = {
-        border: "solid windowtext 1.0pt",
-        borderLeft: "none",
-        padding: "3pt 5.4pt",
-        verticalAlign: "top",
-        fontFamily: "华文宋体",
-    };
-
     return (
         <div className="doc-viewer">
             <div className="doc-page">
@@ -169,81 +153,55 @@ export default function ReportPreview({ data }: Props) {
                     <span style={{ fontFamily: "华文宋体" }}>&nbsp;</span>
                 </p>
 
-                {/* ── 基本信息表格 ───────────────── */}
-                <table
-                    className="MsoTableGrid"
-                    border={0}
-                    cellSpacing={0}
-                    cellPadding={0}
-                    style={{ width: "100%", borderCollapse: "collapse" }}
-                >
-                    <tbody>
-                        {/* 电影周周数 */}
-                        <tr>
-                            <td style={headerLabelStyle}>电影周周数</td>
-                            <td style={headerValueStyle}>
-                                <p className="MsoNormal">第&nbsp;{info.week}&nbsp;周</p>
-                            </td>
-                        </tr>
+                {/* ── 基本信息 ───────────────── */}
+                <div className="basic-info-section" style={{ fontFamily: "华文宋体", fontSize: "12pt" }}>
+                    <p className="MsoNormal">
+                        <b>电影周周数：</b>第&nbsp;{info.week}&nbsp;周
+                    </p>
 
-                        {/* 放映安排 */}
-                        <tr>
-                            <td style={headerLabelStyle}>放映安排</td>
-                            <td style={headerValueStyle}>
-                                {schedule.movies.map((movie) => (
-                                    <p className="MsoNormal" key={movie.chinese}>
-                                        <span style={movie.isSalon ? { fontWeight: "bold" } : undefined}>
-                                            {movie.showDate}&emsp;{movie.startTime}-{movie.endTime}&emsp;
-                                            《{movie.chinese}》
-                                        </span>
-                                    </p>
-                                ))}
-                            </td>
-                        </tr>
+                    <p className="MsoNormal">
+                        <b>放映安排：</b>
+                    </p>
+                    <div style={{ marginLeft: "21pt" }}>
+                        {schedule.movies.map((movie) => (
+                            <p className="MsoNormal" key={movie.chinese}>
+                                <span style={movie.isSalon ? { fontWeight: "bold" } : undefined}>
+                                    {movie.showDate}&emsp;{movie.startTime}-{movie.endTime}&emsp;
+                                    《{movie.chinese}》
+                                </span>
+                            </p>
+                        ))}
+                    </div>
 
-                        {/* 放映主题 */}
-                        <tr>
-                            <td style={headerLabelStyle}>放映主题</td>
-                            <td style={headerValueStyle}>
-                                <p className="MsoNormal">{info.theme}</p>
-                            </td>
-                        </tr>
+                    <p className="MsoNormal">
+                        <b>放映主题：</b>{info.theme}
+                    </p>
 
-                        {/* 策展人信息 */}
-                        <tr>
-                            <td style={headerLabelStyle}>策展人信息</td>
-                            <td style={headerValueStyle}>
-                                <p className="MsoNormal">
-                                    姓名：{info.speaker}
-                                    &emsp;&emsp;
-                                    学号：{info.studentId}
-                                    &emsp;&emsp;
-                                    院系专业：{info.department}
-                                </p>
-                            </td>
-                        </tr>
+                    <p className="MsoNormal">
+                        <b>策展人信息：</b>
+                    </p>
+                    <p className="MsoNormal" style={{ marginLeft: "21pt" }}>
+                        姓名：{info.speaker}
+                        &emsp;&emsp;
+                        学号：{info.studentId}
+                        &emsp;&emsp;
+                        院系专业：{info.department}
+                    </p>
 
-                        {/* 放映意义 */}
-                        <tr>
-                            <td style={headerLabelStyle}>放映意义</td>
-                            <td style={headerValueStyle}>
-                                <p className="MsoNormal" style={{ whiteSpace: "pre-wrap" }}>
-                                    {significance}
-                                </p>
-                            </td>
-                        </tr>
+                    <p className="MsoNormal">
+                        <b>放映意义：</b>
+                    </p>
+                    <p className="MsoNormal" style={{ marginLeft: "21pt", whiteSpace: "pre-wrap" }}>
+                        {significance}
+                    </p>
 
-                        {/* 整体放映风险评价 */}
-                        <tr>
-                            <td style={headerLabelStyle}>整体放映风险评价</td>
-                            <td style={headerValueStyle}>
-                                <p className="MsoNormal" style={{ whiteSpace: "pre-wrap" }}>
-                                    {overallRisk}
-                                </p>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                    <p className="MsoNormal">
+                        <b>整体放映风险评价：</b>
+                    </p>
+                    <p className="MsoNormal" style={{ marginLeft: "21pt", whiteSpace: "pre-wrap" }}>
+                        {overallRisk}
+                    </p>
+                </div>
 
                 <p className="MsoNormal">
                     <span style={{ fontFamily: "华文宋体" }}>&nbsp;</span>

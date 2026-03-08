@@ -7,7 +7,7 @@ export const mockDocumentData: DocumentData = {
   showInstructions: true,
 
   info: {
-    week: "9",
+    week: "",
     speaker: "策展人",
     theme: "战争迷雾",
     themeDesc: "从不同切入点描绘的各种形式的战争",
@@ -15,7 +15,7 @@ export const mockDocumentData: DocumentData = {
     department: "",
   },
 
-  semester: "2025年秋",
+  semester: "2026年春",
   significance: "",
   overallRisk: "",
 

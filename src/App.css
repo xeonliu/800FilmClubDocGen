@@ -106,6 +106,13 @@ body,
   justify-content: space-between;
   margin-bottom: 10px;
   padding-right: 30px; /* 避免与折叠按钮重叠 */
+  gap: 8px;
+}
+
+.editor-panel-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .editor-panel-title {
@@ -405,20 +412,38 @@ body,
 }
 
 /* 打印按钮 */
-.btn-print {
+.btn-print,
+.panel-reset-btn {
   padding: 5px 10px;
-  background: #5563de;
-  color: #fff;
-  border: none;
+  border: 1px solid transparent;
   border-radius: 5px;
   font-size: 12px;
   cursor: pointer;
   white-space: nowrap;
-  transition: background 0.2s;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.btn-print {
+  background: #5563de;
+  color: #fff;
+  border-color: #5563de;
 }
 
 .btn-print:hover {
   background: #3d4fc0;
+  border-color: #3d4fc0;
+}
+
+.panel-reset-btn {
+  background: #fff;
+  color: #606266;
+  border-color: #dcdfe6;
+}
+
+.panel-reset-btn:hover {
+  background: #fef0f0;
+  border-color: #fbc4c4;
+  color: #f56c6c;
 }
 
 /* ============================================================

@@ -42,6 +42,10 @@ export default function SalonModule({ movie, quote, review }: Props) {
             <MovieTable movie={movie} variant="salon" />
 
             <p className="MsoNormal">
+                <span style={{ fontFamily: "华文仿宋" }}>*详细要求参考《电影周宣传资料模板_指南》</span>
+            </p>
+
+            <p className="MsoNormal">
                 <span style={{ fontFamily: "华文仿宋" }}>&nbsp;</span>
             </p>
 
@@ -51,9 +55,25 @@ export default function SalonModule({ movie, quote, review }: Props) {
                 <span style={{ fontFamily: "华文宋体" }}>&nbsp;</span>
             </p>
 
+            <p className="MsoNormal">
+                <span style={{ fontFamily: "华文仿宋" }}>*一句电影中的台词/如果没有合适的也可以自己写一句话：</span>
+            </p>
+            
+            <p className="MsoNormal">
+                <span style={{ fontFamily: "华文宋体" }}>&nbsp;</span>
+            </p>
+            
             {/* 居中引言 */}
             <p className="MsoNormal salon-quote">
-                <span style={{ fontFamily: "华文仿宋" }}>{quote}</span>
+                <span style={{ fontFamily: "华文宋体" }}>{quote}</span>
+            </p>
+
+            <p className="MsoNormal">
+                <span style={{ fontFamily: "华文宋体" }}>&nbsp;</span>
+            </p>
+
+            <p className="MsoNormal">
+                <span style={{ fontFamily: "华文仿宋" }}>*两到三小段话，会用上面的“一句电影中的台词”来将这些段落分隔为两部分，因此出于排版美观需要，请大家让段落长度大致相同，每段100-200字左右</span>
             </p>
 
             <p className="MsoNormal">

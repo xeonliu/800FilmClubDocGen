@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import type { ImportSource } from "../model/editor";
 import type { Movie } from "../model/movie";
 
@@ -152,7 +153,7 @@ export default function MovieImportModal({
     }
   }
 
-  return (
+  return createPortal(
     <div className="modal-overlay" onClick={onClose}>
       <div
         className="modal-box"
@@ -245,6 +246,7 @@ export default function MovieImportModal({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

@@ -52,6 +52,7 @@ npx wrangler deploy  # 部署到生产环境
 - [x] Cloudflare Workers 适配
 - [ ] 导出为 Word (.docx) 格式支持
 - [x] 支持宣传表和报备表两种文档
+- [x] 导出纯文本，支持TXT下载和复制到剪贴板
 
 ## 样例数据来源
 

@@ -1,5 +1,7 @@
 # 800 号电影社影展文档生成器 (800FilmClubDocGen)
 
+![Salon](salon.png)
+
 基于 Vite + React + FastAPI/Cloudflare Workers 构建的自动化影展文档生成工具。旨在解决从豆瓣、TMDB 手动复制电影信息繁琐的问题，支持一键抓取并生成标准格式的报备文档。
 
 ## 🌟 特性

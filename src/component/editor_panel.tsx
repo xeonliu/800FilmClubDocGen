@@ -18,6 +18,7 @@ interface EditorPanelProps {
   collapsed: boolean;
   onToggleCollapse: () => void;
   activeTab?: "doc" | "report";
+  onOpenTour?: () => void;
 }
 
 /** 可折叠区块 */
@@ -497,6 +498,7 @@ export default function EditorPanel({
   onToggleCollapse,
   onReset,
   activeTab = "doc",
+  onOpenTour,
 }: EditorPanelProps) {
   const setInfo = useCallback(
     (key: keyof typeof data.info, value: string) => {
@@ -623,6 +625,16 @@ export default function EditorPanel({
               >
                 🧹 重置
               </button>
+              {onOpenTour && (
+                <button
+                  className="btn-help"
+                  onClick={onOpenTour}
+                  title="打开使用指南"
+                  aria-label="打开使用指南"
+                >
+                  ?
+                </button>
+              )}
             </div>
           </div>
 

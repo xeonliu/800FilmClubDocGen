@@ -804,3 +804,205 @@ body,
 .btn-secondary:hover:not(:disabled) {
   background: #e0e2ee;
 }
+
+/* ============================================================
+   帮助按钮
+   ============================================================ */
+.btn-help {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #eef0ff;
+  border: 1px solid #8891d8;
+  border-radius: 50%;
+  font-size: 13px;
+  font-weight: 700;
+  color: #4455cc;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+  transition: background 0.15s, border-color 0.15s;
+  line-height: 1;
+}
+
+.btn-help:hover {
+  background: #dde1ff;
+  border-color: #5563de;
+}
+
+/* ============================================================
+   使用指南 Modal
+   ============================================================ */
+.tour-guide-modal {
+  width: 620px;
+  max-height: 82vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.tour-guide-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 18px 20px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.tour-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tour-section-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #3a3a5c;
+  margin: 0;
+  padding-bottom: 6px;
+  border-bottom: 2px solid #e8eaf6;
+}
+
+/* 步骤列表 */
+.tour-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tour-step {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.tour-step-num {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  background: #5563de;
+  color: #fff;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1px;
+}
+
+.tour-step-content {
+  flex: 1;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #333;
+}
+
+.tour-step-content strong {
+  font-weight: 700;
+  color: #222;
+}
+
+.tour-step-content p {
+  margin: 2px 0 0;
+  color: #555;
+}
+
+/* 行内代码 */
+.tour-code {
+  display: inline-block;
+  background: #f0f2f8;
+  border: 1px solid #d0d4e8;
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 12px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+  color: #3a3a5c;
+}
+
+/* 键盘按键 */
+.tour-kbd {
+  display: inline-block;
+  background: #f5f5f5;
+  border: 1px solid #bbb;
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-size: 11px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+  color: #333;
+}
+
+/* 提示框 */
+.tour-tip {
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.tour-tip-info {
+  background: #eff3ff;
+  border-left: 3px solid #5563de;
+  color: #3a3a5c;
+}
+
+.tour-tip-note {
+  background: #fffbe6;
+  border-left: 3px solid #f0a500;
+  color: #5a4500;
+  margin-top: 6px;
+}
+
+/* OS 选项卡 */
+.tour-os-tabs {
+  display: flex;
+  gap: 6px;
+}
+
+.tour-os-tab {
+  padding: 5px 14px;
+  border: 1px solid #c8cad8;
+  border-radius: 20px;
+  background: #f5f5fb;
+  color: #555;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.tour-os-tab.active {
+  background: #5563de;
+  border-color: #5563de;
+  color: #fff;
+  font-weight: 600;
+}
+
+.tour-os-tab:hover:not(.active) {
+  border-color: #8891d8;
+  color: #3344bb;
+}
+
+/* 功能列表 */
+.tour-feature-list {
+  margin: 0;
+  padding: 0 0 0 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13px;
+  color: #444;
+  line-height: 1.6;
+}
+
+.tour-feature-list li strong {
+  color: #222;
+}

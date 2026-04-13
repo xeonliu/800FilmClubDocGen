@@ -68,9 +68,9 @@ function App() {
 
   const [panelCollapsed, setPanelCollapsed] = useState(false);
   const [activeTab, setActiveTab] = useState<PreviewTab>("doc");
-  const [tourOpen, setTourOpen] = useState(() => {
-    return !localStorage.getItem(TOUR_SEEN_KEY);
-  });
+  const [tourOpen, setTourOpen] = useState(
+    () => !localStorage.getItem(TOUR_SEEN_KEY)
+  );
 
   function openTour() {
     setTourOpen(true);

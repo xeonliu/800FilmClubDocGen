@@ -3,6 +3,7 @@ import "./App.css";
 import DocumentPreview from "./component/document_preview";
 import ReportPreview from "./component/report_preview";
 import EditorPanel from "./component/editor_panel";
+import TourGuide from "./component/tour_guide";
 import {
   initialEditorState,
   editorFormToDocument,
@@ -11,6 +12,7 @@ import {
 import type { EditorFormData } from "./model/editor";
 
 const STORAGE_KEY = "800_FLIM_CLUB_EDITOR_DATA";
+const TOUR_SEEN_KEY = "800_FILM_CLUB_TOUR_SEEN";
 
 type PreviewTab = "doc" | "report";
 
@@ -66,6 +68,18 @@ function App() {
 
   const [panelCollapsed, setPanelCollapsed] = useState(false);
   const [activeTab, setActiveTab] = useState<PreviewTab>("doc");
+  const [tourOpen, setTourOpen] = useState(
+    () => !localStorage.getItem(TOUR_SEEN_KEY)
+  );
+
+  function openTour() {
+    setTourOpen(true);
+  }
+
+  function closeTour() {
+    localStorage.setItem(TOUR_SEEN_KEY, "1");
+    setTourOpen(false);
+  }
 
   // 当 editorData 改变时自动保存到 localStorage
   useEffect(() => {
@@ -92,6 +106,7 @@ function App() {
         collapsed={panelCollapsed}
         onToggleCollapse={() => setPanelCollapsed((v) => !v)}
         activeTab={activeTab}
+        onOpenTour={openTour}
       />
       <main className="preview-area">
         {/* ── 预览标签栏 ─────────────────── */}
@@ -120,6 +135,7 @@ function App() {
           <ReportPreview data={documentData} />
         </div>
       </main>
+      <TourGuide open={tourOpen} onClose={closeTour} />
     </div>
   );
 }

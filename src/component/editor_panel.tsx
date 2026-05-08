@@ -395,23 +395,23 @@ function buildDocExportText(data: DocumentData): string {
       lines.push(`沙龙篇目${idx + 1}：${normalizeText(movie.chinese)}`);
       lines.push(formatDocMovieDetails(movie));
       lines.push("");
-    });
-    const hasQuote = data.salonQuote.trim().length > 0;
-    const hasReview = data.salonReview.some((p) => p.trim().length > 0);
-    if (hasQuote || hasReview) {
-      lines.push("沙龙引言：");
-      lines.push(normalizeText(data.salonQuote));
-      lines.push("");
-      lines.push("沙龙导赏：");
-      if (data.salonReview.length > 0) {
-        data.salonReview.forEach((para, idx) => {
-          lines.push(`${idx + 1}. ${normalizeText(para)}`);
-        });
-      } else {
-        lines.push("—");
+      const quote = (movie.salonQuote ?? "").trim();
+      const review = (movie.salonReview ?? []).filter((p) => p.trim().length > 0);
+      if (quote.length > 0 || review.length > 0) {
+        lines.push("沙龙引言：");
+        lines.push(normalizeText(quote));
+        lines.push("");
+        lines.push("沙龙导赏：");
+        if (review.length > 0) {
+          review.forEach((para, reviewIdx) => {
+            lines.push(`${reviewIdx + 1}. ${normalizeText(para)}`);
+          });
+        } else {
+          lines.push("—");
+        }
+        lines.push("");
       }
-      lines.push("");
-    }
+    });
   }
 
   if (regularMovies.length > 0) {

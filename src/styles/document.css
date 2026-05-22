@@ -189,7 +189,9 @@
    打印 / PDF 导出样式
    ============================================================ */
 @media print {
-  body, html {
+  html, body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
     height: auto !important;
     overflow: visible !important;
   }
@@ -222,6 +224,9 @@
     page-break-after: always !important;
     break-after: page !important;
     display: block !important;
+    transform: none !important;
+    /* 确保字体在打印时正确显示 */
+    font-family: 等线, DengXian, "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", sans-serif !important;
   }
 
   .doc-page:last-child {
@@ -231,6 +236,34 @@
 
   .doc-page-break-screen {
     display: none !important;
+  }
+
+  /* 移除在打印时可能导致文字缺失的效果 */
+  * {
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  /* 隐藏不需要打印的元素 */
+  .no-print {
+    display: none !important;
+  }
+
+  /* 确保标题字体也正确显示 */
+  .doc-page h1 {
+    font-family: 华文宋体, STSong, SimSun, "Noto Serif CJK SC", serif !important;
+  }
+
+  .doc-page h2 {
+    font-family: 华文宋体, STSong, SimSun, "Noto Serif CJK SC", serif !important;
+  }
+
+  .doc-page .MsoSubtleReference {
+    font-family: 华文仿宋, STFangSong, FangSong, "Noto Serif CJK SC", serif !important;
+  }
+
+  .doc-page .schedule-line {
+    font-family: 华文宋体, STSong, SimSun, "Noto Serif CJK SC", serif !important;
   }
 }
 

@@ -545,6 +545,24 @@ export default function EditorPanel({
     el.select();
   }, [exportModalOpen, exportText]);
 
+  async function handlePrint() {
+    // Wait for all fonts to be loaded before printing
+    if (document.fonts) {
+      try {
+        await document.fonts.ready;
+      } catch {
+        // Silently ignore font loading errors and proceed with print
+      }
+    }
+
+    // Give Chrome time to refresh layout
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        window.print();
+      });
+    });
+  }
+
   async function handleCopy() {
     if (!exportText) return;
     try {
@@ -602,7 +620,7 @@ export default function EditorPanel({
             <div className="editor-panel-actions">
               <button
                 className="btn-print"
-                onClick={() => window.print()}
+                onClick={handlePrint}
                 title={`打印当前预览标签页 / 导出 PDF（当前：${tabName}）`}
               >
                 {printLabel}

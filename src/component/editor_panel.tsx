@@ -47,6 +47,11 @@ import { formatChineseDateDisplay, isoDateToWeekday } from "../utils/date_format
 import MovieImportModal from "./movie_import_modal";
 import TimeSelect from "./time_select";
 
+const PANEL_WIDTH_KEY = "800_FILM_CLUB_PANEL_WIDTH";
+const PANEL_MIN_WIDTH = 320;
+const PANEL_MAX_WIDTH = 760;
+const PANEL_DEFAULT_WIDTH = 420;
+
 interface EditorPanelProps {
   data: EditorFormData;
   documentData: DocumentData;
@@ -574,6 +579,13 @@ export default function EditorPanel({
 
   const tabName = activeTab === "report" ? "报备表" : "宣传资料";
   const [exportModalOpen, setExportModalOpen] = useState(false);
+  const [width, setWidth] = useState(() => {
+    const saved = Number(localStorage.getItem(PANEL_WIDTH_KEY));
+    return Number.isFinite(saved) && saved >= PANEL_MIN_WIDTH
+      ? Math.min(saved, PANEL_MAX_WIDTH)
+      : PANEL_DEFAULT_WIDTH;
+  });
+  const [resizing, setResizing] = useState(false);
   const [copyStatus, setCopyStatus] = useState("");
   const exportTextAreaRef = useRef<HTMLTextAreaElement | null>(null);
   const exportText = useMemo(
@@ -632,12 +644,43 @@ export default function EditorPanel({
     setCopyStatus("");
   }
 
+  function startResize(e: React.PointerEvent<HTMLDivElement>) {
+    e.preventDefault();
+    const startX = e.clientX;
+    const startWidth = width;
+    setResizing(true);
+    let latest = startWidth;
+    const onMove = (ev: PointerEvent) => {
+      latest = Math.min(
+        PANEL_MAX_WIDTH,
+        Math.max(PANEL_MIN_WIDTH, startWidth + ev.clientX - startX)
+      );
+      setWidth(latest);
+    };
+    const onUp = () => {
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+      setResizing(false);
+      localStorage.setItem(PANEL_WIDTH_KEY, String(latest));
+    };
+    document.body.style.cursor = "col-resize";
+    document.body.style.userSelect = "none";
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onUp);
+  }
+
   return (
-    <aside
+    <div
       className={cn(
-        "editor-panel relative z-10 flex shrink-0 flex-col overflow-x-hidden overflow-y-auto border-r bg-background transition-[width] duration-200",
-        collapsed ? "w-10" : "w-[420px]"
+        "editor-panel relative z-10 flex shrink-0",
+        !resizing && "transition-[width] duration-200"
       )}
+      style={{ width: collapsed ? 40 : width }}
+    >
+    <aside
+      className="flex min-w-0 flex-1 flex-col overflow-x-hidden overflow-y-auto border-r bg-background"
       aria-label="编辑面板"
     >
       {/* 折叠切换按钮 */}
@@ -886,5 +929,29 @@ export default function EditorPanel({
         </DialogContent>
       </Dialog>
     </aside>
+
+    {/* 拖拽调整宽度的分隔条 */}
+    {!collapsed && (
+      <div
+        role="separator"
+        aria-orientation="vertical"
+        aria-label="拖拽调整侧边栏宽度"
+        title="拖拽调整宽度，双击恢复默认"
+        className="group absolute inset-y-0 -right-1.5 z-30 flex w-3 cursor-col-resize items-center justify-center"
+        onPointerDown={startResize}
+        onDoubleClick={() => {
+          setWidth(PANEL_DEFAULT_WIDTH);
+          localStorage.setItem(PANEL_WIDTH_KEY, String(PANEL_DEFAULT_WIDTH));
+        }}
+      >
+        <div
+          className={cn(
+            "h-full w-0.5 rounded bg-transparent transition-colors group-hover:bg-primary/60",
+            resizing && "bg-primary"
+          )}
+        />
+      </div>
+    )}
+    </div>
   );
 }

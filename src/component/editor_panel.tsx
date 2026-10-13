@@ -10,6 +10,8 @@ import {
   FileTextIcon,
   RotateCcwIcon,
   HelpCircleIcon,
+  LoaderCircleIcon,
+  CircleAlertIcon,
   Trash2Icon,
   XIcon,
 } from "lucide-react";
@@ -46,6 +48,7 @@ import { createEmptyMovie } from "../utils/editor_utils";
 import { formatChineseDateDisplay, isoDateToWeekday } from "../utils/date_format";
 import MovieImportModal from "./movie_import_modal";
 import TimeSelect from "./time_select";
+import { API_BASE } from "@/lib/api";
 
 const PANEL_WIDTH_KEY = "800_FILM_CLUB_PANEL_WIDTH";
 const PANEL_MIN_WIDTH = 320;
@@ -581,6 +584,8 @@ export default function EditorPanel({
 
   const tabName = activeTab === "report" ? "报备表" : "宣传资料";
   const [exportModalOpen, setExportModalOpen] = useState(false);
+  const [apiCheck, setApiCheck] = useState<"idle" | "checking" | "ok" | "unavailable">("idle");
+  const [apiDetailsOpen, setApiDetailsOpen] = useState(false);
   const [width, setWidth] = useState(() => {
     const saved = Number(localStorage.getItem(PANEL_WIDTH_KEY));
     return Number.isFinite(saved) && saved >= PANEL_MIN_WIDTH
@@ -594,6 +599,29 @@ export default function EditorPanel({
     () => buildExportText(documentData, activeTab),
     [documentData, activeTab]
   );
+
+  const checkApi = useCallback(async () => {
+    setApiCheck("checking");
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 5000);
+    try {
+      const response = await fetch(`${API_BASE}/`, { signal: controller.signal });
+      if (!response.ok) throw new Error("Backend returned an error response");
+      const body: unknown = await response.json();
+      if (!body || typeof body !== "object" || (body as { status?: unknown }).status !== "ok") {
+        throw new Error("Backend health check failed");
+      }
+      setApiCheck("ok");
+    } catch {
+      setApiCheck("unavailable");
+    } finally {
+      window.clearTimeout(timeout);
+    }
+  }, []);
+
+  useEffect(() => {
+    void checkApi();
+  }, [checkApi]);
 
   useEffect(() => {
     if (!exportModalOpen) return;
@@ -682,284 +710,371 @@ export default function EditorPanel({
       )}
       style={mobile ? undefined : { width: collapsed ? 40 : width }}
     >
-    <aside
-      className={cn(
-        "flex min-w-0 flex-1 flex-col overflow-x-hidden overflow-y-auto bg-background",
-        !mobile && "border-r"
-      )}
-      aria-label="编辑面板"
-    >
-      {/* 折叠切换按钮 */}
-      {!mobile && (
-      <Button
-        variant="outline"
-        size="icon-xs"
-        className="absolute top-3 right-2 z-20"
-        onClick={onToggleCollapse}
-        title={collapsed ? "展开编辑面板" : "折叠编辑面板"}
-        aria-label={collapsed ? "展开编辑面板" : "折叠编辑面板"}
+      <aside
+        className={cn(
+          "flex min-w-0 flex-1 flex-col overflow-x-hidden overflow-y-auto bg-background",
+          !mobile && "border-r"
+        )}
+        aria-label="编辑面板"
       >
-        {collapsed ? <ChevronRightIcon /> : <ChevronLeftIcon />}
-      </Button>
-      )}
+        {/* 折叠切换按钮 */}
+        {!mobile && (
+          <Button
+            variant="outline"
+            size="icon-xs"
+            className="absolute top-3 right-2 z-20"
+            onClick={onToggleCollapse}
+            title={collapsed ? "展开编辑面板" : "折叠编辑面板"}
+            aria-label={collapsed ? "展开编辑面板" : "折叠编辑面板"}
+          >
+            {collapsed ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+          </Button>
+        )}
 
-      {!collapsed && (
-        <div className="flex flex-1 flex-col p-3 pb-6">
-          <div className={cn("mb-3 flex flex-col gap-2", !mobile && "pr-8")}>
-            <h2 className="m-0 text-sm font-semibold">信息填写</h2>
-            <div className="flex flex-wrap items-center gap-1.5">
-              <Button
-                size="sm"
-                onClick={() => window.print()}
-                title={`打印当前预览标签页 / 导出 PDF（当前：${tabName}）`}
-              >
-                <PrinterIcon />
-                打印{tabName}
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  setExportModalOpen(true);
-                  setCopyStatus("");
-                }}
-                title={`导出当前预览标签页为纯文本（当前：${tabName}）`}
-              >
-                <FileTextIcon />
-                导出文本
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                className="hover:border-destructive/40 hover:text-destructive"
-                onClick={onReset}
-                title="重置所有数据到初始状态"
-                aria-label="重置所有数据到初始状态"
-              >
-                <RotateCcwIcon />
-                重置
-              </Button>
-              {onOpenTour && (
+        {!collapsed && (
+          <div className="flex flex-1 flex-col p-3 pb-6">
+            <div className={cn("mb-3 flex flex-col gap-2", !mobile && "pr-8")}>
+              <h2 className="m-0 text-sm font-semibold">信息填写</h2>
+              <div className="flex flex-wrap items-center gap-1.5">
                 <Button
-                  variant="ghost"
-                  size="icon-sm"
-                  onClick={onOpenTour}
-                  title="打开使用指南"
-                  aria-label="打开使用指南"
+                  size="sm"
+                  onClick={() => window.print()}
+                  title={`打印当前预览标签页 / 导出 PDF（当前：${tabName}）`}
                 >
-                  <HelpCircleIcon />
+                  <PrinterIcon />
+                  打印{tabName}
                 </Button>
-              )}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setExportModalOpen(true);
+                    setCopyStatus("");
+                  }}
+                  title={`导出当前预览标签页为纯文本（当前：${tabName}）`}
+                >
+                  <FileTextIcon />
+                  导出文本
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="hover:border-destructive/40 hover:text-destructive"
+                  onClick={onReset}
+                  title="重置所有数据到初始状态"
+                  aria-label="重置所有数据到初始状态"
+                >
+                  <RotateCcwIcon />
+                  重置
+                </Button>
+                {onOpenTour && (
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
+                    onClick={onOpenTour}
+                    title="打开使用指南"
+                    aria-label="打开使用指南"
+                  >
+                    <HelpCircleIcon />
+                  </Button>
+                )}
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      onClick={() => {
+                        if (apiCheck === "unavailable") setApiDetailsOpen(true);
+                        else void checkApi();
+                      }}
+                      disabled={apiCheck === "checking"}
+                      title="检查后端连接"
+                      aria-label="检查后端连接"
+                      className={apiCheck === "unavailable" ? "text-destructive" : undefined}
+                    >
+                      {apiCheck === "checking" ? (
+                        <LoaderCircleIcon className="animate-spin" />
+                      ) : apiCheck === "unavailable" ? (
+                        <span className="relative inline-flex">
+                          <GlobeIcon />
+                          <CircleAlertIcon className="absolute -right-1.5 -top-1.5 size-3 fill-background" />
+                        </span>
+                      ) : (
+                        <GlobeIcon />
+                      )}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    {apiCheck === "ok"
+                      ? "后端连接正常"
+                      : apiCheck === "unavailable"
+                        ? "后端无法访问，点击查看原因和建议"
+                        : apiCheck === "checking"
+                          ? "正在检查后端连接"
+                          : "检查后端连接"}
+                  </TooltipContent>
+                </Tooltip>
+              </div>
             </div>
+
+            <Dialog open={apiDetailsOpen} onOpenChange={setApiDetailsOpen}>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-2">
+                    <CircleAlertIcon className="size-5 text-destructive" />
+                    无法连接后端
+                  </DialogTitle>
+                  <DialogDescription>
+                    浏览器无法访问当前配置的后端地址。电影信息导入等需要后端的功能暂时不可用。
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-3 text-sm">
+                  <div className="space-y-1">
+                    <p className="font-medium">检查地址</p>
+                    <code className="block break-all rounded-md bg-muted px-3 py-2 text-xs">
+                      {API_BASE.replace(/\/$/, "")}/
+                    </code>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="font-medium">可以尝试</p>
+                    <ul className="list-disc space-y-1 pl-5 text-muted-foreground">
+                      {API_BASE.includes("localhost") || API_BASE.includes("127.0.0.1") ? (
+                        <>
+                          <li>确认本地 FastAPI 后端已启动，并监听 8000 端口。</li>
+                          <li>如果前端运行在另一台设备或容器中，localhost 指向的是那台设备；请将 VITE_API_BASE 改为后端可访问的地址。</li>
+                        </>
+                      ) : (
+                        <>
+                          <li>Cloudflare Workers 节点位于境外，国内网络可能无法稳定连接；可尝试切换网络。</li>
+                        </>
+                      )}
+                    </ul>
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setApiDetailsOpen(false)}>
+                    关闭
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setApiDetailsOpen(false);
+                      void checkApi();
+                    }}
+                  >
+                    <GlobeIcon />
+                    重新检查
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+
+            {/* ─── 基本信息 ─── */}
+            <Section title="📌 基本信息">
+              <div className="grid grid-cols-2 gap-2">
+                <Field label="周次" tip="本期活动周次编号，如 9">
+                  <Input
+                    className="h-7 text-xs md:text-xs"
+                    placeholder="如：9"
+                    value={data.info.week}
+                    onChange={(e) => setInfo("week", e.target.value)}
+                  />
+                </Field>
+                <Field label="主讲人/策展人" tip="本期主讲/策展嘉宾姓名">
+                  <Input
+                    className="h-7 text-xs md:text-xs"
+                    placeholder="姓名"
+                    value={data.info.speaker}
+                    onChange={(e) => setInfo("speaker", e.target.value)}
+                  />
+                </Field>
+                <Field label="学号" tip="策展人学号（仅用于报备表）">
+                  <Input
+                    className="h-7 text-xs md:text-xs"
+                    placeholder="学号（报备表用）"
+                    value={data.info.studentId}
+                    onChange={(e) => setInfo("studentId", e.target.value)}
+                  />
+                </Field>
+                <Field label="院系专业" tip="策展人院系专业（仅用于报备表）">
+                  <Input
+                    className="h-7 text-xs md:text-xs"
+                    placeholder="如：计算机科学与技术"
+                    value={data.info.department}
+                    onChange={(e) => setInfo("department", e.target.value)}
+                  />
+                </Field>
+              </div>
+              <Field label="主题" tip="本期主题名称">
+                <Input
+                  className="h-7 text-xs md:text-xs"
+                  placeholder="主题名称"
+                  value={data.info.theme}
+                  onChange={(e) => setInfo("theme", e.target.value)}
+                />
+              </Field>
+              <Field label="主题简介" tip="一句话介绍本期主题">
+                <Input
+                  className="h-7 text-xs md:text-xs"
+                  placeholder="一句话介绍"
+                  value={data.info.themeDesc}
+                  onChange={(e) => setInfo("themeDesc", e.target.value)}
+                />
+              </Field>
+              <Field label="学期" tip="学期标识，如 2025年秋（用于报备表标题）">
+                <Input
+                  className="h-7 text-xs md:text-xs"
+                  placeholder="如：2025年秋（报备表用）"
+                  value={data.semester}
+                  onChange={(e) => onChange({ ...data, semester: e.target.value })}
+                />
+              </Field>
+              <Label className="cursor-pointer text-xs">
+                <Checkbox
+                  checked={data.showInstructions}
+                  onCheckedChange={(v) =>
+                    onChange({ ...data, showInstructions: v === true })
+                  }
+                />
+                显示指示说明（模块1）
+              </Label>
+            </Section>
+
+            {/* ─── 主题介绍 ─── */}
+            <Section title="📝 主题介绍">
+              <Field label="正文段落" tip="第4模块展示的主题正文介绍">
+                <Textarea
+                  className="min-h-28 text-xs md:text-xs"
+                  placeholder="主题介绍正文，可多段，使用换行分段"
+                  rows={6}
+                  value={data.themeText}
+                  onChange={(e) => onChange({ ...data, themeText: e.target.value })}
+                />
+              </Field>
+            </Section>
+
+            {/* ─── 报备表专属信息 ─── */}
+            <Section title="📑 报备表信息" defaultOpen={false}>
+              <Hint>以下字段仅用于放映报备表，不影响宣传资料。</Hint>
+              <Field label="放映意义" tip="简要说明本次影展的选片意义和策划初衷">
+                <Textarea
+                  className="text-xs md:text-xs"
+                  placeholder="简要说明本次影展的选片意义和策划初衷"
+                  rows={4}
+                  value={data.significance}
+                  onChange={(e) =>
+                    onChange({ ...data, significance: e.target.value })
+                  }
+                />
+              </Field>
+              <Field
+                label="整体放映风险评价"
+                tip="对本次影展所有影片整体放映风险的综合评估"
+              >
+                <Textarea
+                  className="text-xs md:text-xs"
+                  placeholder="对本次影展所有影片整体放映风险的综合评估"
+                  rows={3}
+                  value={data.overallRisk}
+                  onChange={(e) =>
+                    onChange({ ...data, overallRisk: e.target.value })
+                  }
+                />
+              </Field>
+            </Section>
+
+            {/* ─── 放映安排 ─── */}
+            <Section title="🎬 放映安排">
+              <Hint>
+                点击"添加篇目"增加影片，勾选"沙龙"标记为周五沙龙篇目。篇目数量可任意增减。
+              </Hint>
+              {data.movies.map((movie, i) => (
+                <MovieEditor
+                  key={i}
+                  movie={movie}
+                  index={i}
+                  onChange={(m) => updateMovie(i, m)}
+                  onRemove={() => removeMovie(i)}
+                />
+              ))}
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex-1 border-dashed"
+                  onClick={() => addMovie(false)}
+                  title="添加一部周末影院篇目"
+                >
+                  <PlusIcon />
+                  周末影院篇目
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex-1 border-dashed text-primary"
+                  onClick={() => addMovie(true)}
+                  title="添加一部沙龙篇目"
+                >
+                  <PlusIcon />
+                  沙龙篇目
+                </Button>
+              </div>
+            </Section>
           </div>
+        )}
 
-          {/* ─── 基本信息 ─── */}
-          <Section title="📌 基本信息">
-            <div className="grid grid-cols-2 gap-2">
-              <Field label="周次" tip="本期活动周次编号，如 9">
-                <Input
-                  className="h-7 text-xs md:text-xs"
-                  placeholder="如：9"
-                  value={data.info.week}
-                  onChange={(e) => setInfo("week", e.target.value)}
-                />
-              </Field>
-              <Field label="主讲人/策展人" tip="本期主讲/策展嘉宾姓名">
-                <Input
-                  className="h-7 text-xs md:text-xs"
-                  placeholder="姓名"
-                  value={data.info.speaker}
-                  onChange={(e) => setInfo("speaker", e.target.value)}
-                />
-              </Field>
-              <Field label="学号" tip="策展人学号（仅用于报备表）">
-                <Input
-                  className="h-7 text-xs md:text-xs"
-                  placeholder="学号（报备表用）"
-                  value={data.info.studentId}
-                  onChange={(e) => setInfo("studentId", e.target.value)}
-                />
-              </Field>
-              <Field label="院系专业" tip="策展人院系专业（仅用于报备表）">
-                <Input
-                  className="h-7 text-xs md:text-xs"
-                  placeholder="如：计算机科学与技术"
-                  value={data.info.department}
-                  onChange={(e) => setInfo("department", e.target.value)}
-                />
-              </Field>
-            </div>
-            <Field label="主题" tip="本期主题名称">
-              <Input
-                className="h-7 text-xs md:text-xs"
-                placeholder="主题名称"
-                value={data.info.theme}
-                onChange={(e) => setInfo("theme", e.target.value)}
-              />
-            </Field>
-            <Field label="主题简介" tip="一句话介绍本期主题">
-              <Input
-                className="h-7 text-xs md:text-xs"
-                placeholder="一句话介绍"
-                value={data.info.themeDesc}
-                onChange={(e) => setInfo("themeDesc", e.target.value)}
-              />
-            </Field>
-            <Field label="学期" tip="学期标识，如 2025年秋（用于报备表标题）">
-              <Input
-                className="h-7 text-xs md:text-xs"
-                placeholder="如：2025年秋（报备表用）"
-                value={data.semester}
-                onChange={(e) => onChange({ ...data, semester: e.target.value })}
-              />
-            </Field>
-            <Label className="cursor-pointer text-xs">
-              <Checkbox
-                checked={data.showInstructions}
-                onCheckedChange={(v) =>
-                  onChange({ ...data, showInstructions: v === true })
-                }
-              />
-              显示指示说明（模块1）
-            </Label>
-          </Section>
-
-          {/* ─── 主题介绍 ─── */}
-          <Section title="📝 主题介绍">
-            <Field label="正文段落" tip="第4模块展示的主题正文介绍">
-              <Textarea
-                className="min-h-28 text-xs md:text-xs"
-                placeholder="主题介绍正文，可多段，使用换行分段"
-                rows={6}
-                value={data.themeText}
-                onChange={(e) => onChange({ ...data, themeText: e.target.value })}
-              />
-            </Field>
-          </Section>
-
-          {/* ─── 报备表专属信息 ─── */}
-          <Section title="📑 报备表信息" defaultOpen={false}>
-            <Hint>以下字段仅用于放映报备表，不影响宣传资料。</Hint>
-            <Field label="放映意义" tip="简要说明本次影展的选片意义和策划初衷">
-              <Textarea
-                className="text-xs md:text-xs"
-                placeholder="简要说明本次影展的选片意义和策划初衷"
-                rows={4}
-                value={data.significance}
-                onChange={(e) =>
-                  onChange({ ...data, significance: e.target.value })
-                }
-              />
-            </Field>
-            <Field
-              label="整体放映风险评价"
-              tip="对本次影展所有影片整体放映风险的综合评估"
-            >
-              <Textarea
-                className="text-xs md:text-xs"
-                placeholder="对本次影展所有影片整体放映风险的综合评估"
-                rows={3}
-                value={data.overallRisk}
-                onChange={(e) =>
-                  onChange({ ...data, overallRisk: e.target.value })
-                }
-              />
-            </Field>
-          </Section>
-
-          {/* ─── 放映安排 ─── */}
-          <Section title="🎬 放映安排">
-            <Hint>
-              点击"添加篇目"增加影片，勾选"沙龙"标记为周五沙龙篇目。篇目数量可任意增减。
-            </Hint>
-            {data.movies.map((movie, i) => (
-              <MovieEditor
-                key={i}
-                movie={movie}
-                index={i}
-                onChange={(m) => updateMovie(i, m)}
-                onRemove={() => removeMovie(i)}
-              />
-            ))}
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                className="flex-1 border-dashed"
-                onClick={() => addMovie(false)}
-                title="添加一部周末影院篇目"
-              >
-                <PlusIcon />
-                周末影院篇目
+        <Dialog
+          open={exportModalOpen}
+          onOpenChange={(o) => (o ? setExportModalOpen(true) : closeExport())}
+        >
+          <DialogContent className="sm:max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>导出纯文本</DialogTitle>
+              <DialogDescription>
+                可复制文本（已自动全选），支持直接复制或下载 TXT 文件
+              </DialogDescription>
+            </DialogHeader>
+            <Textarea
+              ref={exportTextAreaRef}
+              className="field-sizing-fixed h-72 max-h-[50vh] resize-none overflow-y-auto font-mono text-xs md:text-xs"
+              value={exportText}
+              readOnly
+              onFocus={() => exportTextAreaRef.current?.select()}
+            />
+            <DialogFooter className="items-center">
+              <span className="mr-auto text-xs text-muted-foreground">
+                {copyStatus}
+              </span>
+              <Button variant="outline" onClick={handleDownload}>
+                下载 TXT
               </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                className="flex-1 border-dashed text-primary"
-                onClick={() => addMovie(true)}
-                title="添加一部沙龙篇目"
-              >
-                <PlusIcon />
-                沙龙篇目
-              </Button>
-            </div>
-          </Section>
+              <Button onClick={handleCopy}>一键复制</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </aside>
+
+      {/* 拖拽调整宽度的分隔条 */}
+      {!collapsed && !mobile && (
+        <div
+          role="separator"
+          aria-orientation="vertical"
+          aria-label="拖拽调整侧边栏宽度"
+          title="拖拽调整宽度，双击恢复默认"
+          className="group absolute inset-y-0 -right-1.5 z-30 flex w-3 cursor-col-resize items-center justify-center"
+          onPointerDown={startResize}
+          onDoubleClick={() => {
+            setWidth(PANEL_DEFAULT_WIDTH);
+            localStorage.setItem(PANEL_WIDTH_KEY, String(PANEL_DEFAULT_WIDTH));
+          }}
+        >
+          <div
+            className={cn(
+              "h-full w-0.5 rounded bg-transparent transition-colors group-hover:bg-primary/60",
+              resizing && "bg-primary"
+            )}
+          />
         </div>
       )}
-
-      <Dialog
-        open={exportModalOpen}
-        onOpenChange={(o) => (o ? setExportModalOpen(true) : closeExport())}
-      >
-        <DialogContent className="sm:max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>导出纯文本</DialogTitle>
-            <DialogDescription>
-              可复制文本（已自动全选），支持直接复制或下载 TXT 文件
-            </DialogDescription>
-          </DialogHeader>
-          <Textarea
-            ref={exportTextAreaRef}
-            className="field-sizing-fixed h-72 max-h-[50vh] resize-none overflow-y-auto font-mono text-xs md:text-xs"
-            value={exportText}
-            readOnly
-            onFocus={() => exportTextAreaRef.current?.select()}
-          />
-          <DialogFooter className="items-center">
-            <span className="mr-auto text-xs text-muted-foreground">
-              {copyStatus}
-            </span>
-            <Button variant="outline" onClick={handleDownload}>
-              下载 TXT
-            </Button>
-            <Button onClick={handleCopy}>一键复制</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </aside>
-
-    {/* 拖拽调整宽度的分隔条 */}
-    {!collapsed && !mobile && (
-      <div
-        role="separator"
-        aria-orientation="vertical"
-        aria-label="拖拽调整侧边栏宽度"
-        title="拖拽调整宽度，双击恢复默认"
-        className="group absolute inset-y-0 -right-1.5 z-30 flex w-3 cursor-col-resize items-center justify-center"
-        onPointerDown={startResize}
-        onDoubleClick={() => {
-          setWidth(PANEL_DEFAULT_WIDTH);
-          localStorage.setItem(PANEL_WIDTH_KEY, String(PANEL_DEFAULT_WIDTH));
-        }}
-      >
-        <div
-          className={cn(
-            "h-full w-0.5 rounded bg-transparent transition-colors group-hover:bg-primary/60",
-            resizing && "bg-primary"
-          )}
-        />
-      </div>
-    )}
     </div>
   );
 }

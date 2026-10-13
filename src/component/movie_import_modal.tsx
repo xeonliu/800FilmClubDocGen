@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/tooltip";
 import type { ImportSource } from "../model/editor";
 import type { Movie } from "../model/movie";
+import { API_BASE } from "@/lib/api";
 
 interface MovieImportModalProps {
   onImport: (movie: Partial<Movie>) => void;
@@ -63,12 +64,6 @@ const SOURCE_OPTIONS: {
     },
   },
 ];
-
-/** 后端 API 地址。
- *  开发时默认 http://localhost:8000（本地，无需 HTTPS）。
- *  生产部署时请在 GitHub Action 的环境变量或项目的 .env 中设置 VITE_API_BASE
- */
-const API_BASE = (import.meta.env.VITE_API_BASE as string | undefined) ?? "http://localhost:8000";
 
 /**
  * 电影信息导入弹窗

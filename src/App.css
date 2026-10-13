@@ -54,6 +54,61 @@ body,
   .tab-hidden {
     display: none !important;
   }
+
+  /* 移动端打印：忽略缩放、始终显示预览、隐藏底部导航 */
+  .preview-area.mobile-hidden {
+    display: block !important;
+  }
+
+  .mobile-nav {
+    display: none !important;
+  }
+
+  .doc-viewer {
+    zoom: 1 !important;
+  }
+}
+
+/* ============================================================
+   移动端（<768px）：单栏 + 底部切换栏
+   ============================================================ */
+@media (max-width: 767px) {
+  .app-layout {
+    flex-direction: column;
+    height: 100dvh;
+  }
+
+  .preview-area {
+    flex: 1;
+    min-height: 0;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .preview-area.mobile-hidden {
+    display: none;
+  }
+
+  /* A4 页面按屏幕宽度等比缩放（--doc-zoom 由 App 计算） */
+  .doc-viewer {
+    zoom: var(--doc-zoom, 1);
+    padding: 12px 0 24px;
+    min-height: 0;
+  }
+
+  .doc-page {
+    margin-bottom: 12px;
+  }
+
+  .mobile-nav {
+    flex-shrink: 0;
+    padding: 6px 12px calc(6px + env(safe-area-inset-bottom));
+  }
+
+  /* 避免 iOS Safari 聚焦输入框时自动放大页面 */
+  input,
+  textarea {
+    font-size: 16px !important;
+  }
 }
 
 /* ============================================================

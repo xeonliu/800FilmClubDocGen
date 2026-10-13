@@ -1,5 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import "./App.css";
+import { PencilLineIcon, EyeIcon } from "lucide-react";
+import { useIsMobile } from "./hooks/use_mobile";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import DocumentPreview from "./component/document_preview";
 import ReportPreview from "./component/report_preview";
@@ -16,6 +18,9 @@ const STORAGE_KEY = "800_FLIM_CLUB_EDITOR_DATA";
 const TOUR_SEEN_KEY = "800_FILM_CLUB_TOUR_SEEN";
 
 type PreviewTab = "doc" | "report";
+
+// A4 页面宽度 595.3pt ≈ 794px
+const A4_WIDTH_PX = 794;
 
 function parseStoredDate(value: unknown): Date | null {
   if (value === null || value === undefined || value === "") return null;
@@ -72,6 +77,19 @@ function App() {
   const [tourOpen, setTourOpen] = useState(
     () => !localStorage.getItem(TOUR_SEEN_KEY)
   );
+  const isMobile = useIsMobile();
+  const [mobileView, setMobileView] = useState<"edit" | "preview">("edit");
+  const [docZoom, setDocZoom] = useState(1);
+
+  // 移动端：把 A4 预览按屏幕宽度等比缩小
+  useEffect(() => {
+    if (!isMobile) return;
+    const update = () =>
+      setDocZoom(Math.min(1, (window.innerWidth - 16) / A4_WIDTH_PX));
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, [isMobile]);
 
   function openTour() {
     setTourOpen(true);
@@ -93,23 +111,32 @@ function App() {
     [editorData]
   );
 
+  const showEditor = !isMobile || mobileView === "edit";
+  const showPreview = !isMobile || mobileView === "preview";
+
   return (
     <div className="app-layout">
-      <EditorPanel
-        data={editorData}
-        documentData={documentData}
-        onChange={setEditorData}
-        onReset={() => {
-          if (window.confirm("确定要清空所有已填内容并重置吗？")) {
-            setEditorData(initialEditorState);
-          }
-        }}
-        collapsed={panelCollapsed}
-        onToggleCollapse={() => setPanelCollapsed((v) => !v)}
-        activeTab={activeTab}
-        onOpenTour={openTour}
-      />
-      <main className="preview-area">
+      {showEditor && (
+        <EditorPanel
+          data={editorData}
+          documentData={documentData}
+          onChange={setEditorData}
+          onReset={() => {
+            if (window.confirm("确定要清空所有已填内容并重置吗？")) {
+              setEditorData(initialEditorState);
+            }
+          }}
+          collapsed={isMobile ? false : panelCollapsed}
+          onToggleCollapse={() => setPanelCollapsed((v) => !v)}
+          activeTab={activeTab}
+          onOpenTour={openTour}
+          mobile={isMobile}
+        />
+      )}
+      <main
+        className={`preview-area${showPreview ? "" : " mobile-hidden"}`}
+        style={{ ["--doc-zoom" as string]: docZoom }}
+      >
         {/* ── 预览标签栏 ─────────────────── */}
         <Tabs
           value={activeTab}
@@ -132,6 +159,27 @@ function App() {
           <ReportPreview data={documentData} />
         </div>
       </main>
+
+      {/* 移动端底部切换栏 */}
+      {isMobile && (
+        <nav className="mobile-nav border-t bg-background">
+          <Tabs
+            value={mobileView}
+            onValueChange={(v) => setMobileView(v as "edit" | "preview")}
+          >
+            <TabsList className="grid h-10 w-full grid-cols-2">
+              <TabsTrigger value="edit">
+                <PencilLineIcon />
+                编辑
+              </TabsTrigger>
+              <TabsTrigger value="preview">
+                <EyeIcon />
+                预览
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </nav>
+      )}
       <TourGuide open={tourOpen} onClose={closeTour} />
     </div>
   );

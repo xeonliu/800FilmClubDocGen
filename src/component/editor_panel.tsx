@@ -61,6 +61,7 @@ interface EditorPanelProps {
   onToggleCollapse: () => void;
   activeTab?: "doc" | "report";
   onOpenTour?: () => void;
+  mobile?: boolean;
 }
 
 /** 可折叠区块 */
@@ -198,8 +199,8 @@ function MovieEditor({
       </div>
 
       {/* 放映时间 */}
-      <div className="grid grid-cols-3 gap-2">
-        <Field label="放映日期">
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+        <Field label="放映日期" className="col-span-2 sm:col-span-1">
           <DateSelect
             value={movie.showDate}
             onChange={(date) => set("showDate", date)}
@@ -550,6 +551,7 @@ export default function EditorPanel({
   onReset,
   activeTab = "doc",
   onOpenTour,
+  mobile = false,
 }: EditorPanelProps) {
   const setInfo = useCallback(
     (key: keyof typeof data.info, value: string) => {
@@ -674,16 +676,21 @@ export default function EditorPanel({
   return (
     <div
       className={cn(
-        "editor-panel relative z-10 flex shrink-0",
-        !resizing && "transition-[width] duration-200"
+        "editor-panel relative z-10 flex",
+        mobile ? "min-h-0 w-full flex-1" : "shrink-0",
+        !resizing && !mobile && "transition-[width] duration-200"
       )}
-      style={{ width: collapsed ? 40 : width }}
+      style={mobile ? undefined : { width: collapsed ? 40 : width }}
     >
     <aside
-      className="flex min-w-0 flex-1 flex-col overflow-x-hidden overflow-y-auto border-r bg-background"
+      className={cn(
+        "flex min-w-0 flex-1 flex-col overflow-x-hidden overflow-y-auto bg-background",
+        !mobile && "border-r"
+      )}
       aria-label="编辑面板"
     >
       {/* 折叠切换按钮 */}
+      {!mobile && (
       <Button
         variant="outline"
         size="icon-xs"
@@ -694,10 +701,11 @@ export default function EditorPanel({
       >
         {collapsed ? <ChevronRightIcon /> : <ChevronLeftIcon />}
       </Button>
+      )}
 
       {!collapsed && (
         <div className="flex flex-1 flex-col p-3 pb-6">
-          <div className="mb-3 flex flex-col gap-2 pr-8">
+          <div className={cn("mb-3 flex flex-col gap-2", !mobile && "pr-8")}>
             <h2 className="m-0 text-sm font-semibold">信息填写</h2>
             <div className="flex flex-wrap items-center gap-1.5">
               <Button
@@ -931,7 +939,7 @@ export default function EditorPanel({
     </aside>
 
     {/* 拖拽调整宽度的分隔条 */}
-    {!collapsed && (
+    {!collapsed && !mobile && (
       <div
         role="separator"
         aria-orientation="vertical"

@@ -141,11 +141,15 @@ function MovieEditor({
   index,
   onChange,
   onRemove,
+  apiCheck,
+  onCheckApi,
 }: {
   movie: EditorMovieData;
   index: number;
   onChange: (m: EditorMovieData) => void;
   onRemove: () => void;
+  apiCheck: "idle" | "checking" | "ok" | "unavailable";
+  onCheckApi: () => Promise<void>;
 }) {
   const [importModalOpen, setImportModalOpen] = useState(false);
 
@@ -360,6 +364,8 @@ function MovieEditor({
 
       {importModalOpen && (
         <MovieImportModal
+          apiCheck={apiCheck}
+          onCheckApi={onCheckApi}
           onImport={handleImport}
           onClose={() => setImportModalOpen(false)}
         />
@@ -1028,6 +1034,8 @@ export default function EditorPanel({
                   key={i}
                   movie={movie}
                   index={i}
+                  apiCheck={apiCheck}
+                  onCheckApi={checkApi}
                   onChange={(m) => updateMovie(i, m)}
                   onRemove={() => removeMovie(i)}
                 />

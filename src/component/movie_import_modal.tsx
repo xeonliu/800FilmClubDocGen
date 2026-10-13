@@ -21,6 +21,8 @@ import type { Movie } from "../model/movie";
 import { API_BASE } from "@/lib/api";
 
 interface MovieImportModalProps {
+  apiCheck: "idle" | "checking" | "ok" | "unavailable";
+  onCheckApi: () => Promise<void>;
   onImport: (movie: Partial<Movie>) => void;
   onClose: () => void;
 }
@@ -70,6 +72,8 @@ const SOURCE_OPTIONS: {
  * 支持从豆瓣 / TMDB / IMDB 导入电影信息
  */
 export default function MovieImportModal({
+  apiCheck,
+  onCheckApi,
   onImport,
   onClose,
 }: MovieImportModalProps) {
@@ -77,6 +81,8 @@ export default function MovieImportModal({
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [networkFailed, setNetworkFailed] = useState(false);
+  const unavailable = apiCheck === "unavailable" || networkFailed;
 
   const currentOption = SOURCE_OPTIONS.find((o) => o.value === source)!;
 
@@ -123,11 +129,13 @@ export default function MovieImportModal({
         body: JSON.stringify({ source, url: url.trim() }),
       });
     } catch {
+      setNetworkFailed(true);
       setError("网络连接失败：无法连接到服务，请检查网络是否可用");
       setLoading(false);
       return;
     }
 
+    setNetworkFailed(false);
     if (!resp.ok) {
       const data = await resp.json().catch(() => ({}));
       const detail =
@@ -168,13 +176,43 @@ export default function MovieImportModal({
     <Dialog open onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>从网络导入电影信息</DialogTitle>
+          <DialogTitle className="flex items-center gap-2">
+            从网络导入电影信息
+            {unavailable && (
+              <AlertTriangleIcon className="size-4 text-destructive" aria-label="后端无法访问" />
+            )}
+          </DialogTitle>
           <DialogDescription>
             粘贴 {currentOption.label} 电影页面链接，后端将自动解析并填入表单
           </DialogDescription>
         </DialogHeader>
 
         <div className="flex flex-col gap-4">
+          {unavailable && (
+            <div role="alert" className="flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-xs text-destructive">
+              <AlertTriangleIcon className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+              <div className="min-w-0 space-y-2">
+                <p className="font-medium">后端暂时无法访问，电影信息可能无法导入。</p>
+                <p className="break-all">后端地址：{API_BASE}</p>
+                <p>
+                  {API_BASE.includes("localhost") || API_BASE.includes("127.0.0.1")
+                    ? "请确认本地后端已启动，且此设备可以访问该地址。"
+                    : "当前后端部署在 Cloudflare 境外节点，国内网络可能连接不稳定。可尝试切换网络后重新检查，也可先手动填写电影信息。"}
+                </p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={apiCheck === "checking"}
+                  onClick={async () => {
+                    await onCheckApi();
+                    setNetworkFailed(false);
+                  }}
+                >
+                  {apiCheck === "checking" ? "正在检查…" : "重新检查连接"}
+                </Button>
+              </div>
+            </div>
+          )}
           {/* 来源选择 */}
           <div className="flex flex-col gap-2">
             <Label>数据来源</Label>

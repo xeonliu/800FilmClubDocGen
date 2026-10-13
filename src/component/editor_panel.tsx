@@ -912,7 +912,7 @@ export default function EditorPanel({
           </DialogHeader>
           <Textarea
             ref={exportTextAreaRef}
-            className="min-h-72 font-mono text-xs md:text-xs"
+            className="field-sizing-fixed h-72 max-h-[50vh] resize-none overflow-y-auto font-mono text-xs md:text-xs"
             value={exportText}
             readOnly
             onFocus={() => exportTextAreaRef.current?.select()}

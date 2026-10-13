@@ -223,7 +223,7 @@ export default function TourGuide({ open, onClose }: TourGuideProps) {
 
         </div>
 
-        <DialogFooter className="border-t px-5 py-3">
+        <DialogFooter className="mx-0 mb-0 border-t px-5 py-3">
           <Button onClick={onClose}>知道了，开始使用</Button>
         </DialogFooter>
       </DialogContent>

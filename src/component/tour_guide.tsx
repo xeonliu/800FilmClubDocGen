@@ -70,8 +70,34 @@ export default function TourGuide({ open, onClose }: TourGuideProps) {
               <li className="tour-step">
                 <span className="tour-step-num">5</span>
                 <div className="tour-step-content">
-                  <strong>切换标签页</strong>
-                  <p>预览区顶部有两个标签：<code className="tour-code">📄 电影周宣传资料</code> 和 <code className="tour-code">📋 放映报备表</code>，点击即可切换预览内容。<strong>打印时只会打印当前激活的标签页内容</strong>，请先切换到目标标签再打印。</p>
+                  <strong>切换标签页与导出文档</strong>
+                  <p>预览区顶部有两个标签：<code className="tour-code">📄 电影周宣传资料</code> 和 <code className="tour-code">📋 放映报备表</code>，点击即可切换预览内容。<strong>导出或打印时只针对当前激活的标签页内容</strong>。首推使用 <code className="tour-code">📄 导出 Word</code> 获取标准排版文档；如需纸质打印或直接生成 PDF，可使用 <code className="tour-code">🖨️ 打印…</code>。</p>
+                </div>
+              </li>
+            </ol>
+          </section>
+
+          {/* ── 导出 Word ──────────────────────────── */}
+          <section className="tour-section">
+            <h3 className="tour-section-title">📄 导出 Word（首选项）</h3>
+
+            <div className="tour-tip tour-tip-info">
+              ⭐ <strong>首选推荐导出为 Word 文档：</strong>一键生成标准排版的 <code>.docx</code> 格式文档（包含封面、表格与正文样式），便于留存归档、直接提交审核流转以及在 Office 中进一步二次编辑。
+            </div>
+
+            <ol className="tour-steps" style={{ marginTop: "12px" }}>
+              <li className="tour-step">
+                <span className="tour-step-num">1</span>
+                <div className="tour-step-content">
+                  <strong>确认目标标签页</strong>
+                  <p>在预览区顶部切换到需要导出的文档（<code className="tour-code">📄 电影周宣传资料</code> 或 <code className="tour-code">📋 放映报备表</code>）。</p>
+                </div>
+              </li>
+              <li className="tour-step">
+                <span className="tour-step-num">2</span>
+                <div className="tour-step-content">
+                  <strong>点击首选项按钮一键导出</strong>
+                  <p>点击左侧面板顶部的首选项按钮 <code className="tour-code">📄 导出 Word</code>，系统将自动打包生成并下载对应的 Word 文档（如 <code>第X周_宣传资料.docx</code> 或 <code>第X周_报备表.docx</code>）。</p>
                 </div>
               </li>
             </ol>
@@ -79,10 +105,10 @@ export default function TourGuide({ open, onClose }: TourGuideProps) {
 
           {/* ── 打印 / 导出 PDF ───────────────────── */}
           <section className="tour-section">
-            <h3 className="tour-section-title">🖨️ 打印 / 导出 PDF</h3>
+            <h3 className="tour-section-title">🖨️ 打印 / 导出 PDF（备选方案）</h3>
 
             <div className="tour-tip tour-tip-info">
-              💡 <strong>打印前请先切换到目标标签页：</strong>确保预览区顶部高亮的是你想打印的文档（宣传资料或报备表），再点击左上角的打印按钮。
+              💡 <strong>如需纸质打印或直接另存为 PDF：</strong>请确保预览区顶部高亮的是目标文档（宣传资料或报备表），再点击左上角「打印…」按钮或使用快捷键。
             </div>
 
             {/* OS 选项卡 */}

@@ -764,11 +764,12 @@ export default function EditorPanel({
               <div className="flex flex-wrap items-center gap-1.5">
                 <Button
                   size="sm"
-                  onClick={() => window.print()}
-                  title={`打印当前预览标签页 / 导出 PDF（当前：${tabName}）`}
+                  onClick={handleExportWord}
+                  disabled={exportingWord}
+                  title={`导出当前预览标签页为 Word 文档（当前：${tabName}）`}
                 >
-                  <PrinterIcon />
-                  打印{tabName}
+                  {exportingWord ? <LoaderCircleIcon className="animate-spin" /> : <FileDownIcon />}
+                  导出{tabName} Word
                 </Button>
                 <Button
                   variant="outline"
@@ -782,16 +783,15 @@ export default function EditorPanel({
                   <FileTextIcon />
                   导出文本
                 </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleExportWord}
-                disabled={exportingWord}
-                title={`导出当前预览标签页为 Word 文档（当前：${tabName}）`}
-              >
-                {exportingWord ? <LoaderCircleIcon className="animate-spin" /> : <FileDownIcon />}
-                导出 Word
-              </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => window.print()}
+                  title={`打印当前预览标签页 / 导出 PDF（当前：${tabName}）`}
+                >
+                  <PrinterIcon />
+                  打印{tabName}
+                </Button>
                 <Button
                   variant="outline"
                   size="sm"

@@ -12,6 +12,7 @@ import {
   HelpCircleIcon,
   LoaderCircleIcon,
   CircleAlertIcon,
+  FileDownIcon,
   Trash2Icon,
   XIcon,
 } from "lucide-react";
@@ -584,6 +585,7 @@ export default function EditorPanel({
 
   const tabName = activeTab === "report" ? "报备表" : "宣传资料";
   const [exportModalOpen, setExportModalOpen] = useState(false);
+  const [exportingWord, setExportingWord] = useState(false);
   const [apiCheck, setApiCheck] = useState<"idle" | "checking" | "ok" | "unavailable">("idle");
   const [apiDetailsOpen, setApiDetailsOpen] = useState(false);
   const [width, setWidth] = useState(() => {
@@ -618,6 +620,30 @@ export default function EditorPanel({
       window.clearTimeout(timeout);
     }
   }, []);
+
+  async function handleExportWord() {
+    setExportingWord(true);
+    try {
+      const title = activeTab === "report" ? "主题影展信息报备表" : "电影周宣传资料";
+      const { exportWordPreview } = await import("../utils/word_export");
+      const pages = Array.from(document.querySelectorAll<HTMLElement>(".tab-content:not(.tab-hidden) .doc-page"));
+      const blob = await exportWordPreview(pages, title);
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      const week = documentData.info.week.trim();
+      link.href = url;
+      link.download = `${week ? `第${week}周_` : ""}${tabName}.docx`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch (error) {
+      console.error("Word 文档导出失败", error);
+      window.alert("Word 文档导出失败，请稍后重试。");
+    } finally {
+      setExportingWord(false);
+    }
+  }
 
   useEffect(() => {
     void checkApi();
@@ -756,6 +782,16 @@ export default function EditorPanel({
                   <FileTextIcon />
                   导出文本
                 </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleExportWord}
+                disabled={exportingWord}
+                title={`导出当前预览标签页为 Word 文档（当前：${tabName}）`}
+              >
+                {exportingWord ? <LoaderCircleIcon className="animate-spin" /> : <FileDownIcon />}
+                导出 Word
+              </Button>
                 <Button
                   variant="outline"
                   size="sm"

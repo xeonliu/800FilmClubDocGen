@@ -10,9 +10,36 @@
 - **智能防反爬**：后端采用三级回退机制（网页解析 -> Rexxar API -> Abstract API），确保豆瓣数据的高成功率获取。
 - **实时预览**：前端支持表单实时编辑与文档排版预览。
 - **打印支持**：完美适配 A4 纸张排版，可直接通过浏览器打印为 PDF。
+- **文档导出**：支持导出 Word（.docx）和纯文本，可下载 TXT 或复制到剪贴板。
 - **双后端支持**：
   - **Python (FastAPI)**：适合本地或服务器部署。
   - **Cloudflare Workers**：支持 Serverless 部署，高性能且零成本。
+
+## 界面截图
+
+### 宣传资料编辑与预览
+
+左侧填写影展信息，右侧实时预览，可导出 Word、纯文本或打印为 PDF。
+
+<table>
+  <tr><th>桌面端</th><th>移动端</th></tr>
+  <tr>
+    <td width="75%"><img src="docs/screenshots/publicity.png" alt="桌面端宣传资料编辑与预览" width="100%" /></td>
+    <td width="25%"><img src="docs/screenshots/publicity-mobile.png" alt="移动端宣传资料预览" width="100%" /></td>
+  </tr>
+</table>
+
+### 放映报备表
+
+切换标签即可查看报备表，导出和打印针对当前标签页。
+
+<table>
+  <tr><th>桌面端</th><th>移动端</th></tr>
+  <tr>
+    <td width="75%"><img src="docs/screenshots/report.png" alt="桌面端放映报备表预览" width="100%" /></td>
+    <td width="25%"><img src="docs/screenshots/report-mobile.png" alt="移动端放映报备表预览" width="100%" /></td>
+  </tr>
+</table>
 
 ## 🚀 快速开始
 

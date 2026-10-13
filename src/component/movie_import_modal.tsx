@@ -1,5 +1,21 @@
 import { useState } from "react";
-import { createPortal } from "react-dom";
+import { AlertTriangleIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import type { ImportSource } from "../model/editor";
 import type { Movie } from "../model/movie";
 
@@ -153,31 +169,28 @@ export default function MovieImportModal({
     }
   }
 
-  return createPortal(
-    <div className="modal-overlay" onClick={onClose}>
-      <div
-        className="modal-box"
-        onClick={(e) => e.stopPropagation()}
-        role="dialog"
-        aria-modal="true"
-        aria-label="导入电影信息"
-      >
-        <div className="modal-header">
-          <span className="modal-title">🎬 从网络导入电影信息</span>
-          <button className="modal-close-btn" onClick={onClose} aria-label="关闭">
-            ✕
-          </button>
-        </div>
+  return (
+    <Dialog open onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>从网络导入电影信息</DialogTitle>
+          <DialogDescription>
+            粘贴 {currentOption.label} 电影页面链接，后端将自动解析并填入表单
+          </DialogDescription>
+        </DialogHeader>
 
-        <div className="modal-body">
+        <div className="flex flex-col gap-4">
           {/* 来源选择 */}
-          <div className="modal-field">
-            <label className="modal-label">数据来源</label>
-            <div className="source-tabs">
-              {SOURCE_OPTIONS.map((opt) => (
-                <div key={opt.value} className="source-tab-wrapper">
-                  <button
-                    className={`source-tab${source === opt.value ? " active" : ""}`}
+          <div className="flex flex-col gap-2">
+            <Label>数据来源</Label>
+            <div className="flex gap-2">
+              {SOURCE_OPTIONS.map((opt) => {
+                const btn = (
+                  <Button
+                    key={opt.value}
+                    size="sm"
+                    variant={source === opt.value ? "default" : "outline"}
+                    className="rounded-full px-4"
                     onClick={() => {
                       setSource(opt.value);
                       setUrl("");
@@ -185,34 +198,35 @@ export default function MovieImportModal({
                     }}
                   >
                     {opt.label}
-                  </button>
-                  {opt.tooltip && (
-                    <div className="source-tooltip" role="tooltip">
-                      <div className="source-tooltip-title">{opt.tooltip.title}</div>
-                      <div className="source-tooltip-desc">{opt.tooltip.description}</div>
+                  </Button>
+                );
+                if (!opt.tooltip) return btn;
+                return (
+                  <Tooltip key={opt.value}>
+                    <TooltipTrigger asChild>{btn}</TooltipTrigger>
+                    <TooltipContent className="max-w-64">
+                      <div className="font-semibold">{opt.tooltip.title}</div>
+                      <div className="mb-1 opacity-80">{opt.tooltip.description}</div>
                       <a
-                        className="source-tooltip-link"
+                        className="underline"
                         href={opt.tooltip.link}
                         target="_blank"
                         rel="noreferrer"
                       >
                         {opt.tooltip.linkLabel}
                       </a>
-                    </div>
-                  )}
-                </div>
-              ))}
+                    </TooltipContent>
+                  </Tooltip>
+                );
+              })}
             </div>
           </div>
 
           {/* URL 输入 */}
-          <div className="modal-field">
-            <label className="modal-label" htmlFor="import-url">
-              电影链接
-            </label>
-            <input
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="import-url">电影链接</Label>
+            <Input
               id="import-url"
-              className="modal-input"
               type="url"
               placeholder={currentOption.placeholder}
               value={url}
@@ -224,29 +238,26 @@ export default function MovieImportModal({
               disabled={loading}
               autoFocus
             />
-            <span className="modal-hint">
-              粘贴 {currentOption.label} 电影页面链接，后端将自动解析并填入表单
-            </span>
           </div>
 
           {/* 错误提示 */}
-          {error && <div className="modal-error">⚠️ {error}</div>}
+          {error && (
+            <div className="flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-xs text-destructive">
+              <AlertTriangleIcon className="mt-0.5 size-3.5 shrink-0" />
+              {error}
+            </div>
+          )}
         </div>
 
-        <div className="modal-footer">
-          <button className="btn-secondary" onClick={onClose} disabled={loading}>
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose} disabled={loading}>
             取消
-          </button>
-          <button
-            className="btn-primary"
-            onClick={handleImport}
-            disabled={loading || !url.trim()}
-          >
+          </Button>
+          <Button onClick={handleImport} disabled={loading || !url.trim()}>
             {loading ? "导入中…" : "确认导入"}
-          </button>
-        </div>
-      </div>
-    </div>,
-    document.body
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

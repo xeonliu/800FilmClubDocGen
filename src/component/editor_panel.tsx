@@ -1,7 +1,44 @@
 import { useState, useCallback, useEffect, useMemo, useRef } from "react";
-import { createPortal } from "react-dom";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+import {
+  ChevronDownIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  GlobeIcon,
+  InfoIcon,
+  PlusIcon,
+  PrinterIcon,
+  FileTextIcon,
+  RotateCcwIcon,
+  HelpCircleIcon,
+  Trash2Icon,
+  XIcon,
+} from "lucide-react";
+import DateSelect from "./date_select";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
 import type { EditorFormData, EditorMovieData } from "../model/editor";
 import type { Movie, MovieWithSchedule } from "../model/movie";
 import type { DocumentData } from "../model/document";
@@ -33,28 +70,59 @@ function Section({
 }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div className="editor-section">
-      <button
-        className="editor-section-header"
-        onClick={() => setOpen((v) => !v)}
-        aria-expanded={open}
-      >
-        <span className="section-arrow">{open ? "▾" : "▸"}</span>
+    <Collapsible
+      open={open}
+      onOpenChange={setOpen}
+      className="mb-3 overflow-hidden rounded-xl border bg-card shadow-xs"
+    >
+      <CollapsibleTrigger className="flex w-full items-center gap-2 bg-muted/60 px-3 py-2 text-left text-[13px] font-semibold transition-colors hover:bg-muted">
+        <ChevronDownIcon
+          className={cn(
+            "size-4 shrink-0 text-muted-foreground transition-transform",
+            !open && "-rotate-90"
+          )}
+        />
         <span>{title}</span>
-      </button>
-      {open && <div className="editor-section-body">{children}</div>}
+      </CollapsibleTrigger>
+      <CollapsibleContent>
+        <div className="flex flex-col gap-3 p-3">{children}</div>
+      </CollapsibleContent>
+    </Collapsible>
+  );
+}
+
+/** 表单项：标签 + 控件 */
+function Field({
+  label,
+  tip,
+  className,
+  children,
+}: {
+  label: string;
+  tip?: string;
+  className?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className={cn("flex min-w-0 flex-col gap-1.5", className)}>
+      <Label className="text-xs text-muted-foreground">
+        {label}
+        {tip && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <InfoIcon className="size-3.5 cursor-help text-primary/70" />
+            </TooltipTrigger>
+            <TooltipContent className="max-w-64">{tip}</TooltipContent>
+          </Tooltip>
+        )}
+      </Label>
+      {children}
     </div>
   );
 }
 
-/** 带 tooltip 的标签 */
-function LabelWithTip({ label, tip }: { label: string; tip: string }) {
-  return (
-    <span className="editor-label-with-tip" title={tip}>
-      {label}
-      <span className="editor-label-tip-icon" aria-hidden="true">ⓘ</span>
-    </span>
-  );
+function Hint({ children }: { children: React.ReactNode }) {
+  return <p className="text-xs leading-relaxed text-muted-foreground">{children}</p>;
 }
 
 /** 单部影片的编辑区块 */
@@ -79,198 +147,167 @@ function MovieEditor({
     onChange({ ...movie, ...partial });
   }
 
-  const movieLabel = movie.chinese
-    ? movie.chinese
-    : `篇目 ${index + 1}`;
+  const movieLabel = movie.chinese ? movie.chinese : `篇目 ${index + 1}`;
+
+  const fields = [
+    { key: "chinese", label: "中文名", hint: "电影中文名称" },
+    { key: "foreign", label: "外文名", hint: "原片名或英文名" },
+    { key: "year", label: "年份", hint: "上映年份，如 1984" },
+    { key: "director", label: "导演", hint: "多人用 / 分隔" },
+    { key: "writer", label: "编剧", hint: "多人用 / 分隔" },
+    { key: "actors", label: "主演", hint: "多人用 / 分隔" },
+    { key: "genre", label: "类型", hint: "如 剧情 / 战争" },
+    { key: "region", label: "地区", hint: "如 中国大陆" },
+    { key: "length", label: "片长(分钟)", hint: "如 120" },
+    { key: "douban", label: "豆瓣评分", hint: "如 9.1" },
+  ] as { key: keyof EditorMovieData; label: string; hint: string }[];
 
   return (
-    <div className="movie-editor-card">
-      <div className="movie-editor-card-header">
-        <span className="movie-card-label">
-          {movie.isSalon ? "🎭 " : "🎬 "}
-          {movieLabel}
-        </span>
-        <div className="movie-card-actions">
-          <label className="inline-checkbox" title="标记为周五沙龙篇目">
-            <input
-              type="checkbox"
+    <div className="flex flex-col gap-3 rounded-xl border bg-muted/30 p-3">
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex min-w-0 items-center gap-2">
+          <Badge variant={movie.isSalon ? "default" : "secondary"}>
+            {movie.isSalon ? "沙龙" : "放映"}
+          </Badge>
+          <span className="truncate text-[13px] font-semibold">{movieLabel}</span>
+        </div>
+        <div className="flex shrink-0 items-center gap-2">
+          <Label className="cursor-pointer text-xs" title="标记为周五沙龙篇目">
+            <Checkbox
               checked={movie.isSalon}
-              onChange={(e) => set("isSalon", e.target.checked)}
+              onCheckedChange={(v) => set("isSalon", v === true)}
             />
-            &nbsp;沙龙
-          </label>
-          <button
-            className="btn-icon btn-danger"
+            沙龙
+          </Label>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            className="text-muted-foreground hover:text-destructive"
             onClick={onRemove}
             title="删除此篇目"
             aria-label="删除此篇目"
           >
-            🗑
-          </button>
+            <Trash2Icon />
+          </Button>
         </div>
       </div>
 
       {/* 放映时间 */}
-      <div className="movie-schedule-row">
-        <div className="editor-field">
-          <label className="editor-label">放映日期</label>
-          <DatePicker
-            selected={movie.showDate}
-            onChange={(date: Date | null) => set("showDate", date)}
-            dateFormat="yyyy-MM-dd"
-            placeholderText="选择日期"
-            className="editor-datepicker"
-            isClearable
-            portalId="datepicker-portal"
-            popperPlacement="bottom-end"
+      <div className="grid grid-cols-3 gap-2">
+        <Field label="放映日期">
+          <DateSelect
+            value={movie.showDate}
+            onChange={(date) => set("showDate", date)}
           />
-        </div>
-        <div className="editor-field">
-          <label className="editor-label">开始时间</label>
+        </Field>
+        <Field label="开始时间">
           <TimeSelect
             value={movie.startTime}
             onChange={(v) => set("startTime", v)}
           />
-        </div>
-        <div className="editor-field">
-          <label className="editor-label">结束时间</label>
-          <TimeSelect
-            value={movie.endTime}
-            onChange={(v) => set("endTime", v)}
-          />
-        </div>
+        </Field>
+        <Field label="结束时间">
+          <TimeSelect value={movie.endTime} onChange={(v) => set("endTime", v)} />
+        </Field>
       </div>
 
-      {/* 导入按钮 */}
-      <button
-        className="btn-import"
+      <Button
+        variant="outline"
+        size="sm"
+        className="w-full border-dashed text-primary"
         onClick={() => setImportModalOpen(true)}
         title="从豆瓣/TMDB/IMDB导入电影信息"
       >
-        🌐 从网络导入电影信息
-      </button>
+        <GlobeIcon />
+        从网络导入电影信息
+      </Button>
 
       {/* 电影基本信息字段 */}
-      <div className="movie-fields-grid">
-        {(
-          [
-            { key: "chinese", label: "中文名", hint: "电影中文名称" },
-            { key: "foreign", label: "外文名", hint: "原片名或英文名" },
-            { key: "year", label: "年份", hint: "上映年份，如 1984" },
-            { key: "director", label: "导演", hint: "多人用 / 分隔" },
-            { key: "writer", label: "编剧", hint: "多人用 / 分隔" },
-            { key: "actors", label: "主演", hint: "多人用 / 分隔" },
-            { key: "genre", label: "类型", hint: "如 剧情 / 战争" },
-            { key: "region", label: "地区", hint: "如 中国大陆" },
-            { key: "length", label: "片长(分钟)", hint: "如 120" },
-            { key: "douban", label: "豆瓣评分", hint: "如 9.1" },
-          ] as { key: keyof EditorMovieData; label: string; hint: string }[]
-        ).map(({ key, label, hint }) => (
-          <div key={key} className="editor-field">
-            <label className="editor-label" title={hint}>
-              {label}
-            </label>
-            <input
-              className="editor-input"
-              type="text"
+      <div className="grid grid-cols-2 gap-2">
+        {fields.map(({ key, label, hint }) => (
+          <Field key={key} label={label}>
+            <Input
+              className="h-7 text-xs md:text-xs"
               placeholder={hint}
               value={movie[key] as string}
               onChange={(e) => set(key, e.target.value)}
             />
-          </div>
+          </Field>
         ))}
       </div>
 
-      {/* 剧情简介 */}
-      <div className="editor-field editor-field-full">
-        <label className="editor-label" title="剧情概述，约100字">
-          剧情简介
-        </label>
-        <textarea
-          className="editor-textarea"
+      <Field label="剧情简介">
+        <Textarea
+          className="text-xs md:text-xs"
           placeholder="剧情概述，约100字"
           rows={3}
           value={movie.desc}
           onChange={(e) => set("desc", e.target.value)}
         />
-      </div>
+      </Field>
 
-      {/* 豆瓣短评 */}
-      <div className="editor-field editor-field-full">
-        <label className="editor-label" title="豆瓣热门短评一则">
-          豆瓣短评
-        </label>
-        <textarea
-          className="editor-textarea"
+      <Field label="豆瓣短评">
+        <Textarea
+          className="text-xs md:text-xs"
           placeholder="豆瓣热门短评一则"
           rows={2}
           value={movie.short}
           onChange={(e) => set("short", e.target.value)}
         />
-      </div>
+      </Field>
 
       {/* 报备表字段：获奖信息 / 推荐理由 / 放映风险 */}
-      <div className="editor-field editor-field-full">
-        <label className="editor-label" title="所获主要奖项，如无则填「无」">
-          获奖信息
-        </label>
-        <input
-          className="editor-input"
-          type="text"
+      <Field label="获奖信息">
+        <Input
+          className="h-7 text-xs md:text-xs"
           placeholder='所获主要奖项，如无则填"无"'
           value={movie.awards}
           onChange={(e) => set("awards", e.target.value)}
         />
-      </div>
+      </Field>
 
-      <div className="editor-field editor-field-full">
-        <LabelWithTip
-          label="推荐理由"
-          tip="请从所获奖项、影视地位、艺术解读等角度阐述选片的原因（仅用于报备表）"
-        />
-        <textarea
-          className="editor-textarea"
+      <Field
+        label="推荐理由"
+        tip="请从所获奖项、影视地位、艺术解读等角度阐述选片的原因（仅用于报备表）"
+      >
+        <Textarea
+          className="text-xs md:text-xs"
           placeholder="请从所获奖项、影视地位、艺术解读等角度阐述选片的原因"
           rows={3}
           value={movie.recommendation}
           onChange={(e) => set("recommendation", e.target.value)}
         />
-      </div>
+      </Field>
 
-      <div className="editor-field editor-field-full">
-        <LabelWithTip
-          label="放映风险"
-          tip="1）查找并附上该电影可放映的所有官方渠道（如爱奇艺、腾讯视频、bilibili）；2）若无在线正版播放渠道，可查找官方电影节或电影资料馆的公映记录；3）如以上均无，请对电影主题、镜头、台词等可能存在的风险进行预判（仅用于报备表）"
-        />
-        <textarea
-          className="editor-textarea"
+      <Field
+        label="放映风险"
+        tip="1）查找并附上该电影可放映的所有官方渠道（如爱奇艺、腾讯视频、bilibili）；2）若无在线正版播放渠道，可查找官方电影节或电影资料馆的公映记录；3）如以上均无，请对电影主题、镜头、台词等可能存在的风险进行预判（仅用于报备表）"
+      >
+        <Textarea
+          className="text-xs md:text-xs"
           placeholder="附上官方放映渠道链接，或说明放映风险"
           rows={2}
           value={movie.risk}
           onChange={(e) => set("risk", e.target.value)}
         />
-      </div>
+      </Field>
 
       {/* 沙龙专属字段：引言与导赏 */}
       {movie.isSalon && (
-        <div className="salon-editor-fields">
-          <div className="editor-field editor-field-full">
-            <label className="editor-label">沙龙引言</label>
-            <input
-              className="editor-input"
-              type="text"
+        <div className="flex flex-col gap-3 rounded-lg border border-primary/30 bg-primary/5 p-3">
+          <Field label="沙龙引言">
+            <Input
+              className="h-7 text-xs md:text-xs"
               placeholder="一句电影中的台词..."
               value={movie.salonQuote || ""}
               onChange={(e) => set("salonQuote", e.target.value)}
             />
-          </div>
-          <div className="editor-field editor-field-full">
-            <label className="editor-label">沙龙导赏正文</label>
+          </Field>
+          <Field label="沙龙导赏正文">
             {(movie.salonReview || [""]).map((text, idx) => (
-              <div key={idx} className="salon-review-row" style={{ display: "flex", gap: "4px", marginBottom: "4px" }}>
-                <textarea
-                  className="editor-textarea"
-                  style={{ flex: 1 }}
+              <div key={idx} className="flex gap-1.5">
+                <Textarea
+                  className="flex-1 text-xs md:text-xs"
                   placeholder={`第 ${idx + 1} 段导赏文字...`}
                   rows={3}
                   value={text}
@@ -280,25 +317,34 @@ function MovieEditor({
                     set("salonReview", next);
                   }}
                 />
-                <button
-                  className="btn-icon btn-danger"
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  className="text-muted-foreground hover:text-destructive"
+                  aria-label="删除此段"
                   onClick={() => {
-                    const next = (movie.salonReview || [""]).filter((_, i) => i !== idx);
+                    const next = (movie.salonReview || [""]).filter(
+                      (_, i) => i !== idx
+                    );
                     set("salonReview", next.length ? next : [""]);
                   }}
                 >
-                  ✕
-                </button>
+                  <XIcon />
+                </Button>
               </div>
             ))}
-            <button
-              className="btn-add-item"
-              style={{ marginTop: "4px" }}
-              onClick={() => set("salonReview", [...(movie.salonReview || [""]), ""])}
+            <Button
+              variant="outline"
+              size="sm"
+              className="self-start"
+              onClick={() =>
+                set("salonReview", [...(movie.salonReview || [""]), ""])
+              }
             >
-              + 添加导赏段落
-            </button>
-          </div>
+              <PlusIcon />
+              添加导赏段落
+            </Button>
+          </Field>
         </div>
       )}
 
@@ -527,8 +573,6 @@ export default function EditorPanel({
   }
 
   const tabName = activeTab === "report" ? "报备表" : "宣传资料";
-  const printLabel = `🖨️ 打印${tabName}`;
-  const exportLabel = `📝 导出文本`;
   const [exportModalOpen, setExportModalOpen] = useState(false);
   const [copyStatus, setCopyStatus] = useState("");
   const exportTextAreaRef = useRef<HTMLTextAreaElement | null>(null);
@@ -539,10 +583,13 @@ export default function EditorPanel({
 
   useEffect(() => {
     if (!exportModalOpen) return;
-    const el = exportTextAreaRef.current;
-    if (!el) return;
-    el.focus();
-    el.select();
+    const timer = window.setTimeout(() => {
+      const el = exportTextAreaRef.current;
+      if (!el) return;
+      el.focus();
+      el.select();
+    }, 50);
+    return () => window.clearTimeout(timer);
   }, [exportModalOpen, exportText]);
 
   async function handleCopy() {
@@ -580,217 +627,200 @@ export default function EditorPanel({
     setCopyStatus("已生成TXT");
   }
 
+  function closeExport() {
+    setExportModalOpen(false);
+    setCopyStatus("");
+  }
+
   return (
     <aside
-      className={`editor-panel${collapsed ? " collapsed" : ""}`}
+      className={cn(
+        "editor-panel relative z-10 flex shrink-0 flex-col overflow-x-hidden overflow-y-auto border-r bg-background transition-[width] duration-200",
+        collapsed ? "w-10" : "w-[420px]"
+      )}
       aria-label="编辑面板"
     >
       {/* 折叠切换按钮 */}
-      <button
-        className="panel-collapse-btn"
+      <Button
+        variant="outline"
+        size="icon-xs"
+        className="absolute top-3 right-2 z-20"
         onClick={onToggleCollapse}
         title={collapsed ? "展开编辑面板" : "折叠编辑面板"}
         aria-label={collapsed ? "展开编辑面板" : "折叠编辑面板"}
       >
-        {collapsed ? "▶" : "◀"}
-      </button>
+        {collapsed ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+      </Button>
 
       {!collapsed && (
-        <div className="editor-panel-inner">
-          <div className="editor-panel-top">
-            <h2 className="editor-panel-title">📋 信息填写</h2>
-            <div className="editor-panel-actions">
-              <button
-                className="btn-print"
+        <div className="flex flex-1 flex-col p-3 pb-6">
+          <div className="mb-3 flex flex-col gap-2 pr-8">
+            <h2 className="m-0 text-sm font-semibold">信息填写</h2>
+            <div className="flex flex-wrap items-center gap-1.5">
+              <Button
+                size="sm"
                 onClick={() => window.print()}
                 title={`打印当前预览标签页 / 导出 PDF（当前：${tabName}）`}
               >
-                {printLabel}
-              </button>
-              <button
-                className="btn-export"
+                <PrinterIcon />
+                打印{tabName}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => {
                   setExportModalOpen(true);
                   setCopyStatus("");
                 }}
                 title={`导出当前预览标签页为纯文本（当前：${tabName}）`}
               >
-                {exportLabel}
-              </button>
-              <button
-                className="panel-reset-btn"
+                <FileTextIcon />
+                导出文本
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="hover:border-destructive/40 hover:text-destructive"
                 onClick={onReset}
                 title="重置所有数据到初始状态"
                 aria-label="重置所有数据到初始状态"
               >
-                🧹 重置
-              </button>
+                <RotateCcwIcon />
+                重置
+              </Button>
               {onOpenTour && (
-                <button
-                  className="btn-help"
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
                   onClick={onOpenTour}
                   title="打开使用指南"
                   aria-label="打开使用指南"
                 >
-                  ?
-                </button>
+                  <HelpCircleIcon />
+                </Button>
               )}
             </div>
           </div>
 
           {/* ─── 基本信息 ─── */}
           <Section title="📌 基本信息">
-            <div className="editor-field">
-              <label className="editor-label" title="本期活动周次编号，如 9">
-                周次
-              </label>
-              <input
-                className="editor-input"
-                type="text"
-                placeholder="如：9"
-                value={data.info.week}
-                onChange={(e) => setInfo("week", e.target.value)}
-              />
+            <div className="grid grid-cols-2 gap-2">
+              <Field label="周次" tip="本期活动周次编号，如 9">
+                <Input
+                  className="h-7 text-xs md:text-xs"
+                  placeholder="如：9"
+                  value={data.info.week}
+                  onChange={(e) => setInfo("week", e.target.value)}
+                />
+              </Field>
+              <Field label="主讲人/策展人" tip="本期主讲/策展嘉宾姓名">
+                <Input
+                  className="h-7 text-xs md:text-xs"
+                  placeholder="姓名"
+                  value={data.info.speaker}
+                  onChange={(e) => setInfo("speaker", e.target.value)}
+                />
+              </Field>
+              <Field label="学号" tip="策展人学号（仅用于报备表）">
+                <Input
+                  className="h-7 text-xs md:text-xs"
+                  placeholder="学号（报备表用）"
+                  value={data.info.studentId}
+                  onChange={(e) => setInfo("studentId", e.target.value)}
+                />
+              </Field>
+              <Field label="院系专业" tip="策展人院系专业（仅用于报备表）">
+                <Input
+                  className="h-7 text-xs md:text-xs"
+                  placeholder="如：计算机科学与技术"
+                  value={data.info.department}
+                  onChange={(e) => setInfo("department", e.target.value)}
+                />
+              </Field>
             </div>
-            <div className="editor-field">
-              <label className="editor-label" title="本期主讲/策展嘉宾姓名">
-                主讲人/策展人
-              </label>
-              <input
-                className="editor-input"
-                type="text"
-                placeholder="姓名"
-                value={data.info.speaker}
-                onChange={(e) => setInfo("speaker", e.target.value)}
-              />
-            </div>
-            <div className="editor-field">
-              <label className="editor-label" title="策展人学号（仅用于报备表）">
-                学号
-              </label>
-              <input
-                className="editor-input"
-                type="text"
-                placeholder="学号（报备表用）"
-                value={data.info.studentId}
-                onChange={(e) => setInfo("studentId", e.target.value)}
-              />
-            </div>
-            <div className="editor-field">
-              <label className="editor-label" title="策展人院系专业（仅用于报备表）">
-                院系专业
-              </label>
-              <input
-                className="editor-input"
-                type="text"
-                placeholder="如：计算机科学与技术（报备表用）"
-                value={data.info.department}
-                onChange={(e) => setInfo("department", e.target.value)}
-              />
-            </div>
-            <div className="editor-field">
-              <label className="editor-label" title="本期主题名称">
-                主题
-              </label>
-              <input
-                className="editor-input"
-                type="text"
+            <Field label="主题" tip="本期主题名称">
+              <Input
+                className="h-7 text-xs md:text-xs"
                 placeholder="主题名称"
                 value={data.info.theme}
                 onChange={(e) => setInfo("theme", e.target.value)}
               />
-            </div>
-            <div className="editor-field">
-              <label className="editor-label" title="一句话介绍本期主题">
-                主题简介
-              </label>
-              <input
-                className="editor-input"
-                type="text"
+            </Field>
+            <Field label="主题简介" tip="一句话介绍本期主题">
+              <Input
+                className="h-7 text-xs md:text-xs"
                 placeholder="一句话介绍"
                 value={data.info.themeDesc}
                 onChange={(e) => setInfo("themeDesc", e.target.value)}
               />
-            </div>
-            <div className="editor-field">
-              <label className="editor-label" title="学期标识，如 2025年秋（用于报备表标题）">
-                学期
-              </label>
-              <input
-                className="editor-input"
-                type="text"
+            </Field>
+            <Field label="学期" tip="学期标识，如 2025年秋（用于报备表标题）">
+              <Input
+                className="h-7 text-xs md:text-xs"
                 placeholder="如：2025年秋（报备表用）"
                 value={data.semester}
                 onChange={(e) => onChange({ ...data, semester: e.target.value })}
               />
-            </div>
-            <div className="editor-field">
-              <label className="editor-label inline-label">
-                <input
-                  type="checkbox"
-                  checked={data.showInstructions}
-                  onChange={(e) =>
-                    onChange({ ...data, showInstructions: e.target.checked })
-                  }
-                />
-                &nbsp;显示指示说明（模块1）
-              </label>
-            </div>
+            </Field>
+            <Label className="cursor-pointer text-xs">
+              <Checkbox
+                checked={data.showInstructions}
+                onCheckedChange={(v) =>
+                  onChange({ ...data, showInstructions: v === true })
+                }
+              />
+              显示指示说明（模块1）
+            </Label>
           </Section>
 
           {/* ─── 主题介绍 ─── */}
           <Section title="📝 主题介绍">
-            <div className="editor-field editor-field-full">
-              <label className="editor-label" title="第4模块展示的主题正文介绍">
-                正文段落
-              </label>
-              <textarea
-                className="editor-textarea editor-textarea-lg"
+            <Field label="正文段落" tip="第4模块展示的主题正文介绍">
+              <Textarea
+                className="min-h-28 text-xs md:text-xs"
                 placeholder="主题介绍正文，可多段，使用换行分段"
                 rows={6}
                 value={data.themeText}
                 onChange={(e) => onChange({ ...data, themeText: e.target.value })}
               />
-            </div>
+            </Field>
           </Section>
 
           {/* ─── 报备表专属信息 ─── */}
           <Section title="📑 报备表信息" defaultOpen={false}>
-            <p className="editor-hint">以下字段仅用于放映报备表，不影响宣传资料。</p>
-            <div className="editor-field editor-field-full">
-              <LabelWithTip
-                label="放映意义"
-                tip="简要说明本次影展的选片意义和策划初衷"
-              />
-              <textarea
-                className="editor-textarea"
+            <Hint>以下字段仅用于放映报备表，不影响宣传资料。</Hint>
+            <Field label="放映意义" tip="简要说明本次影展的选片意义和策划初衷">
+              <Textarea
+                className="text-xs md:text-xs"
                 placeholder="简要说明本次影展的选片意义和策划初衷"
                 rows={4}
                 value={data.significance}
-                onChange={(e) => onChange({ ...data, significance: e.target.value })}
+                onChange={(e) =>
+                  onChange({ ...data, significance: e.target.value })
+                }
               />
-            </div>
-            <div className="editor-field editor-field-full">
-              <LabelWithTip
-                label="整体放映风险评价"
-                tip="对本次影展所有影片整体放映风险的综合评估"
-              />
-              <textarea
-                className="editor-textarea"
+            </Field>
+            <Field
+              label="整体放映风险评价"
+              tip="对本次影展所有影片整体放映风险的综合评估"
+            >
+              <Textarea
+                className="text-xs md:text-xs"
                 placeholder="对本次影展所有影片整体放映风险的综合评估"
                 rows={3}
                 value={data.overallRisk}
-                onChange={(e) => onChange({ ...data, overallRisk: e.target.value })}
+                onChange={(e) =>
+                  onChange({ ...data, overallRisk: e.target.value })
+                }
               />
-            </div>
+            </Field>
           </Section>
 
           {/* ─── 放映安排 ─── */}
           <Section title="🎬 放映安排">
-            <p className="editor-hint">
-              点击"+ 添加篇目"增加影片，勾选"沙龙"标记为周五沙龙篇目。
-              篇目数量可任意增减。
-            </p>
+            <Hint>
+              点击"添加篇目"增加影片，勾选"沙龙"标记为周五沙龙篇目。篇目数量可任意增减。
+            </Hint>
             {data.movies.map((movie, i) => (
               <MovieEditor
                 key={i}
@@ -800,87 +830,61 @@ export default function EditorPanel({
                 onRemove={() => removeMovie(i)}
               />
             ))}
-            <div className="add-movie-row">
-              <button
-                className="btn-add"
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex-1 border-dashed"
                 onClick={() => addMovie(false)}
                 title="添加一部周末影院篇目"
               >
-                + 周末影院篇目
-              </button>
-              <button
-                className="btn-add btn-add-salon"
+                <PlusIcon />
+                周末影院篇目
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex-1 border-dashed text-primary"
                 onClick={() => addMovie(true)}
                 title="添加一部沙龙篇目"
               >
-                + 沙龙篇目
-              </button>
+                <PlusIcon />
+                沙龙篇目
+              </Button>
             </div>
           </Section>
         </div>
       )}
 
-      {exportModalOpen &&
-        createPortal(
-          <div
-            className="modal-overlay"
-            onClick={() => {
-              setExportModalOpen(false);
-              setCopyStatus("");
-            }}
-          >
-            <div
-              className="modal-box export-modal"
-              onClick={(e) => e.stopPropagation()}
-              role="dialog"
-              aria-modal="true"
-              aria-label="导出纯文本"
-            >
-              <div className="modal-header">
-                <span className="modal-title">📝 导出纯文本</span>
-                <button
-                  className="modal-close-btn"
-                  onClick={() => {
-                    setExportModalOpen(false);
-                    setCopyStatus("");
-                  }}
-                  aria-label="关闭"
-                >
-                  ✕
-                </button>
-              </div>
-              <div className="modal-body">
-                <div className="modal-field">
-                  <label className="modal-label">可复制文本（已自动全选）</label>
-                  <textarea
-                    ref={exportTextAreaRef}
-                    className="export-textarea"
-                    value={exportText}
-                    readOnly
-                    onFocus={() => exportTextAreaRef.current?.select()}
-                  />
-                  <span className="modal-hint">
-                    支持直接复制或下载 TXT 文件
-                  </span>
-                </div>
-              </div>
-              <div className="modal-footer export-modal-footer">
-                {copyStatus ? (
-                  <span className="export-copy-status">{copyStatus}</span>
-                ) : (
-                  <span className="export-copy-status">&nbsp;</span>
-                )}
-                <button className="btn-secondary" onClick={handleDownload}>
-                  下载 TXT
-                </button>
-                <button className="btn-primary" onClick={handleCopy}>
-                  一键复制
-                </button>
-              </div>
-            </div>
-          </div>,
-          document.body
-        )}
+      <Dialog
+        open={exportModalOpen}
+        onOpenChange={(o) => (o ? setExportModalOpen(true) : closeExport())}
+      >
+        <DialogContent className="sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>导出纯文本</DialogTitle>
+            <DialogDescription>
+              可复制文本（已自动全选），支持直接复制或下载 TXT 文件
+            </DialogDescription>
+          </DialogHeader>
+          <Textarea
+            ref={exportTextAreaRef}
+            className="min-h-72 font-mono text-xs md:text-xs"
+            value={exportText}
+            readOnly
+            onFocus={() => exportTextAreaRef.current?.select()}
+          />
+          <DialogFooter className="items-center">
+            <span className="mr-auto text-xs text-muted-foreground">
+              {copyStatus}
+            </span>
+            <Button variant="outline" onClick={handleDownload}>
+              下载 TXT
+            </Button>
+            <Button onClick={handleCopy}>一键复制</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </aside>
   );
 }

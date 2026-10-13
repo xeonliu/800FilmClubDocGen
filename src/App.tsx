@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import "./App.css";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import DocumentPreview from "./component/document_preview";
 import ReportPreview from "./component/report_preview";
 import EditorPanel from "./component/editor_panel";
@@ -110,20 +111,16 @@ function App() {
       />
       <main className="preview-area">
         {/* ── 预览标签栏 ─────────────────── */}
-        <div className="preview-tabs">
-          <button
-            className={`preview-tab${activeTab === "doc" ? " active" : ""}`}
-            onClick={() => setActiveTab("doc")}
-          >
-            📄 电影周宣传资料
-          </button>
-          <button
-            className={`preview-tab${activeTab === "report" ? " active" : ""}`}
-            onClick={() => setActiveTab("report")}
-          >
-            📋 放映报备表
-          </button>
-        </div>
+        <Tabs
+          value={activeTab}
+          onValueChange={(v) => setActiveTab(v as PreviewTab)}
+          className="preview-tabs sticky top-0 z-20 border-b bg-background px-3 py-2"
+        >
+          <TabsList>
+            <TabsTrigger value="doc">📄 电影周宣传资料</TabsTrigger>
+            <TabsTrigger value="report">📋 放映报备表</TabsTrigger>
+          </TabsList>
+        </Tabs>
 
         {/* ── 文档预览（宣传资料）─────────── */}
         <div className={activeTab === "doc" ? "tab-content" : "tab-content tab-hidden"}>

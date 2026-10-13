@@ -1,5 +1,13 @@
 import { useState } from "react";
-import { createPortal } from "react-dom";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface TourGuideProps {
   open: boolean;
@@ -17,31 +25,12 @@ const OS_LABELS: Record<OsTab, string> = {
 export default function TourGuide({ open, onClose }: TourGuideProps) {
   const [osTab, setOsTab] = useState<OsTab>("windows");
 
-  if (!open) return null;
-
-  return createPortal(
-    <div
-      className="modal-overlay"
-      onClick={onClose}
-      role="dialog"
-      aria-modal="true"
-      aria-label="使用指南"
-    >
-      <div
-        className="modal-box tour-guide-modal"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* 标题栏 */}
-        <div className="modal-header">
-          <span className="modal-title">📖 使用指南</span>
-          <button
-            className="modal-close-btn"
-            onClick={onClose}
-            aria-label="关闭指南"
-          >
-            ✕
-          </button>
-        </div>
+  return (
+    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="flex max-h-[85vh] flex-col gap-0 p-0 sm:max-w-2xl">
+        <DialogHeader className="border-b px-5 py-4">
+          <DialogTitle>使用指南</DialogTitle>
+        </DialogHeader>
 
         {/* 正文 */}
         <div className="tour-guide-body">
@@ -97,17 +86,15 @@ export default function TourGuide({ open, onClose }: TourGuideProps) {
             </div>
 
             {/* OS 选项卡 */}
-            <div className="tour-os-tabs">
-              {(Object.keys(OS_LABELS) as OsTab[]).map((os) => (
-                <button
-                  key={os}
-                  className={`tour-os-tab${osTab === os ? " active" : ""}`}
-                  onClick={() => setOsTab(os)}
-                >
-                  {OS_LABELS[os]}
-                </button>
-              ))}
-            </div>
+            <Tabs value={osTab} onValueChange={(v) => setOsTab(v as OsTab)}>
+              <TabsList>
+                {(Object.keys(OS_LABELS) as OsTab[]).map((os) => (
+                  <TabsTrigger key={os} value={os}>
+                    {OS_LABELS[os]}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+            </Tabs>
 
             {/* Windows */}
             {osTab === "windows" && (
@@ -236,14 +223,10 @@ export default function TourGuide({ open, onClose }: TourGuideProps) {
 
         </div>
 
-        {/* 底部 */}
-        <div className="modal-footer">
-          <button className="btn-primary" onClick={onClose}>
-            知道了，开始使用
-          </button>
-        </div>
-      </div>
-    </div>,
-    document.body
+        <DialogFooter className="border-t px-5 py-3">
+          <Button onClick={onClose}>知道了，开始使用</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
